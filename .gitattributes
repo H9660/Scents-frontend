@@ -1,0 +1,2 @@
+large-file.ext filter=lfs diff=lfs merge=lfs -text
+scenty/** filter=lfs diff=lfs merge=lfs -text

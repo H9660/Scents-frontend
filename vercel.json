@@ -1,0 +1,35 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "next.config.ts",
+        "use": "@vercel/next"
+      },
+      {
+        "src": "backend/server.ts",
+        "use": "@vercel/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/users/(.*)",
+        "dest": "/backend/index.ts"
+      },
+      {
+        "src": "/perfume/(.*)",
+        "dest": "/backend/index.js"
+      },
+      {
+        "src": "/payment/(.*)",
+        "dest": "/backend/index.js"
+      },
+      {
+        "src": "(.*)",
+        "dest": "/src$1"
+      }
+    ],
+    "env": {
+      "DATABASE_URL": "postgresql://neondb_owner:npg_qXWH8mYgxOs2@ep-long-king-a1h6g89c-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require",
+      "NEXT_PUBLIC_API_URL": "/api"
+    }
+  }
