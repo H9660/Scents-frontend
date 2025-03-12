@@ -7,10 +7,11 @@ import { Spinner } from "@/Components/ui/spinner";
 import { getUserCart } from "../slices/authSlice";
 import { verifyPayment } from "@/slices/paymentSlice";
 import { FaExclamationCircle } from "react-icons/fa";
-import Razorpay from "razorpay"
+import Razorpay from 'razorpay'
 interface Window {
-  Razorpay: any;
+  Razorpay: new (options: any) => any;
 }
+
 export default function Shoppingcart() {
   const router = useRouter();
   const [total, setTotal] = useState(0);

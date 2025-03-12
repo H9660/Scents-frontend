@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, Button, Image, Grid, Box, Text, Center } from "@chakra-ui/react";
-import { Spinner } from "@/Components/ui/Spinner";
+import { Spinner } from "../Components/ui/spinner";
 import { getperfumes } from "../slices/perfumeSlice";
 import { addToCart } from "../slices/authSlice";
 export default function Shoppingpage() {
