@@ -1,157 +1,150 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import { Card, Button, Image, Grid, Box, Text, Center } from "@chakra-ui/react";
-import { Spinner } from "../Components/ui/spinner";
-import { getperfumes } from "../slices/perfumeSlice";
-import { addToCart } from "../slices/authSlice";
-export default function Shoppingpage() {
+import { useSelector } from "react-redux";
+import { Button, Image, Grid, Box, Text} from "@chakra-ui/react";
+import { Spinner } from "@/Components/ui/spinner.tsx";
+import { addToCart } from "../slices/authSlice.ts";
+import { RootState } from "@/slices/store.ts";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { perfumeData } from "@/slices/types.ts";
+import { User } from "@/slices/types.ts";
+
+export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [user, setUser] = useState({});
-  const { perfumes } = useSelector((state) => state.perfumes);
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
     let user = localStorage.getItem("savedUser");
     if (user) user = JSON.parse(user);
-    setUser(user);
-    dispatch(getperfumes());
-  }, [dispatch]);
+    setUser(user as string);
+  }, []);
 
   if (isLoading) {
     return <Spinner />;
   }
   return (
     <>
-      <Box
-        //   m={10}
-        fontFamily="Sirin Stencil"
-        margin="auto 10% auto"
-        textAlign="center"
-        color={"white"}
-        fontSize="8xl"
-        width="clamp(200px, auto, 600px)"
-        borderBottom="2px solid gray"
-        marginBottom={20}
-      >
-        Our latest arrivals
-      </Box>
-      <Grid
-        justifyContent="center"
-        width="clamp(200px,auto, 600px)"
-        display="flex"
-        //   placeItems="center"
-        marginBottom="4rem"
-        flexWrap="wrap"
-        templateColumns="repeat(5, minmax(0, 1fr))"
-        gap="10"
-      >
-        {perfumes.map((link) => {
-          return (
+      <div className="mainDiv">
+        <Box
+          fontFamily="Sirin Stencil"
+          margin="auto 10%"
+          textAlign="center"
+          color="white"
+          fontSize="8xl"
+          borderBottom="4px solid gray"
+          marginBottom={20}
+        >
+          Our latest arrivals
+        </Box>
+
+        <Grid
+          margin="auto 2rem"
+          justifyContent="center"
+          width="clamp(200px,auto, 600px)"
+          // maxWidth="1400px"
+          flexWrap="wrap"
+          templateColumns={{ base: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }}
+          gap={8} // Increased gap for better spacing
+        >
+          {perfumesData.map((link: perfumeData) => (
             <Box
-            key={link.name}
+              key={link.name}
               fontFamily="Sirin Stencil"
               border="1px solid white"
               borderRadius="1rem"
               padding="12px"
               transition="0.1s ease-in-out"
               _hover={{
-                boxShadow: "0 0 10px 2px white", // Creates the glow effect
-                borderColor: "pink", // Optional: Change border color
+                boxShadow: "0 0 10px 2px white",
+                borderColor: "pink",
               }}
             >
-              <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap="6">
-                <Center>
-                  <Image
-                    objectFit="contain"
-                    position="relative"
-                    alignItems="center"
-                    rounded="md"
-                    src={link.imageUrl}
-                    alt="Dan Abramov"
-                    maxH="300px"
-                  />
-                </Center>
-                <Card.Root width="320px">
-                  <Card.Body textAlign="center" gap="2" spaceY="2rem">
-                    <Card.Title
-                      fontSize="3rem"
-                      textWrap="wrap"
-                      lineHeight="shorter"
-                    >
-                      {link.name}
-                    </Card.Title>
-                    <Card.Description fontSize={{ base: "2rem" }}>
-                      Queen Energy Eau De Parfum Intense
-                    </Card.Description>
-                  </Card.Body>
+              <Image
+                objectFit="contain" // Ensures the image fits without being cut
+                rounded="md"
+                src={link.imageUrl}
+                alt={link.name}
+                maxH="300px"
+                // alignSelf="center"
+                {...(link.name === "Dylin Blue" && { marginTop: "1.5rem" })} 
+                width="100%"
+              />
 
-                  <Card.Footer justifyContent="flex-end">
-                    <Text fontSize="xl" fontWeight="bold" mr="10px">
-                      ₹ {link.price}
-                    </Text>
-                    <Button
-                      variant="outline"
-                      border="1px solid white"
-                      padding="10px"
-                      mr="0.8rem"
-                      width="auto"
-                      borderRadius="4px"
-                      fontWeight="bold"
-                      transition="0.3s ease-out"
-                      _hover={{
-                        bg: "white",
-                        color: "black",
-                      }}
-                      onClick={() => {
-                        if(!user)
-                        {
-                          router.push("/login")
-                          return
-                        }
-                        const data = {
-                          userId: user.id,
-                          cart: {
-                            [link.name]: 1,
-                          },
-                        };
-                        console.log(user.id);
-                        dispatch(addToCart(data));
-                        toast.success("Added to cart successfully");
-                      }}
-                    >
-                      Add to cart
-                    </Button>
-                    <Button
-                      color="black"
-                      fontWeight="bold"
-                      backgroundColor="#FFB433"
-                      padding="10px"
-                      borderRadius="4px"
-                      // ml="1rem"
-                      transition="0.3s ease-out"
-                      _hover={{
-                        bg: "pink",
-                        color: "black",
-                      }}
-                      onClick={() =>
-                        router.push(
-                          `/perfumeContext?name=${link.name}&url=${
-                            link.imageUrl
-                          }&price=${link.price || 1000}`
-                        )
-                      }
-                    >
-                      Buy now
-                    </Button>
-                  </Card.Footer>
-                </Card.Root>
-              </Grid>
+              <Box textAlign="center" mt={4}>
+                <Text
+                  fontSize="2rem"
+                  whiteSpace="normal"
+                  lineHeight="shorter"
+                  marginBottom="1rem"
+                >
+                  {link.name}
+                </Text>
+                <Text fontSize="1.2rem" fontStyle="italic">
+                  {link.discription}
+                </Text>
+
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  gap={7}
+                  mt={2}
+                  spaceY={5}
+                >
+                  <Text fontSize={{base: "2xl", md: "3xl" }}fontWeight="bold" color="white">
+                    ₹ {link.price}
+                  </Text>
+                  <Button
+                    variant="outline"
+                    border="1px solid white"
+                    borderRadius="4px"
+                    fontWeight="bold"
+                    width="33%"
+                    padding="1rem"
+                    fontSize="1rem"
+                    _hover={{ bg: "white", color: "black" }}
+                    onClick={() => {
+                      if (!user) return router.push("/login");
+                      dispatch(
+                        addToCart({
+                          userId: (user as User).id,
+                          cart: { [link.name]: 1 },
+                        })
+                      );
+                      toast.success("Added to cart successfully");
+                    }}
+                  >
+                    Add to cart
+                  </Button>
+
+                  <Button
+                    color="black"
+                    backgroundColor="#FFB433"
+                    padding="1rem"
+                    position="relative"
+                    fontWeight="bold"
+                    fontSize="1rem"
+                    borderRadius="4px"
+                    width="33%"
+                    _hover={{ bg: "pink", color: "black" }}
+                    onClick={() =>
+                      router.push(
+                        `/perfumeContext?name=${link.name}&url=${
+                          link.imageUrl
+                        }&price=${link.price || 1000}`
+                      )
+                    }
+                  >
+                    Buy now
+                  </Button>
+                </Box>
+              </Box>
             </Box>
-          );
-        })}
-      </Grid>
+          ))}
+        </Grid>
+      </div>
     </>
   );
 }

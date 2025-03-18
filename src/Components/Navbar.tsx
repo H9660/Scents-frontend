@@ -91,7 +91,7 @@ const Navbar = () => {
           <>
           <DrawerRoot>
             <DrawerBackdrop />
-            <DrawerTrigger asChild>
+            <DrawerTrigger>
               <Button
                 display={{ base: "flex", md: "none" }} // Show only on small screens
                 variant="outline"

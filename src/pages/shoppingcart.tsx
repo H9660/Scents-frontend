@@ -1,82 +1,87 @@
-import { useEffect, useState } from "react";
-import { Tables } from "@/Components/ui/table";
+import { useEffect, useState} from "react";
+import  Tables  from "@/Components/ui/table.tsx";
 import { Button, Center, Text, Grid } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { Spinner } from "@/Components/ui/spinner";
-import { getUserCart } from "../slices/authSlice";
-import { verifyPayment } from "@/slices/paymentSlice";
+import useSWR from "swr";
+import { Spinner } from "@/Components/ui/spinner.tsx";
 import { FaExclamationCircle } from "react-icons/fa";
-import Razorpay from 'razorpay'
-interface Window {
-  Razorpay: new (options: any) => any;
+import { User } from "@/slices/types.ts";
+import { RazorpayOptions, RazorpayInstance } from "@/slices/types.ts";
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
 }
-
 export default function Shoppingcart() {
   const router = useRouter();
-  const [total, setTotal] = useState(0);
-  const dispatch = useDispatch();
   const [user, setUser] = useState({});
-  const [cart, setCart] = useState({});
-  const { isLoading } = useSelector((state) => state.auth);
-  const { ispaymentLoading } = useSelector((state) => state.payments);
-  useEffect(()=> {
-    (async () => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      script.onload = () => {
-        console.log("Razorpay script loaded!");
-      };
-      document.body.appendChild(script);
+  const [total, setTotal] = useState(0);
+  const getCart = async () => {
+    console.log(process.env.API_KEY);
+    const user = JSON.parse(localStorage.getItem("savedUser") || "");
+    const userCart = await fetch(
+      `${process.env.NEXT_PUBLIC_API_KEY}api/users/getCart?userId=${user.id}`
+    );
+    const parsedCart = await userCart.json();
+    setTotal(parsedCart.price);
+    return parsedCart;
+  };
 
-      let user = localStorage.getItem("savedUser");
+  const { data, isLoading } = useSWR(
+    "render",
+    getCart
+  );
+
+  useEffect(() => {
+      const user = JSON.parse(localStorage.getItem("savedUser") || "");
       if (!user) {
         router.push("/login");
         return;
       }
-      if (user) user = JSON.parse(user);
-      setUser(user);
-      const userCart = await dispatch(getUserCart(user.id));
-      console.log(userCart);
-      setCart(userCart.payload.cart);
-      setTotal(userCart.payload.price);
-    })();
-  }, []);
+      setUser(user as string);
+  }, [router]);
 
+  if (isLoading) return <Spinner />;
   const handlePayment = async () => {
-    const res = await fetch(
-      `api/payment/makePayment`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: total * 100, // Amount in paise (₹500)
-          userId: user.id, // Example user ID
-        }),
-      }
-    );
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded!");
+    };
+    document.body.appendChild(script);
+    const res = await fetch(`api/payment/makePayment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: data?.price * 100, // Amount in paise (₹500)
+        userId: (user as User).id, // Example user ID
+      }),
+    });
     const { order } = await res.json(); // Get order details from backend
 
-    const options = {
-      key_id: "rzp_test_UZYDhupdHjejNu",
+    const options: RazorpayOptions = {
+      key_id: process.env.RAZORPAY_KEY_ID!,
       amount: order.amount,
       currency: "INR",
       name: "Scents",
-      description: `Payment from ${user.id}: ${total}`,
+      description: `Payment from ${(user as User).id}: ${data?.price}`,
       order_id: order.id,
       handler: function (response) {
         const verifyData = {
-          userId: user.id,
+          userId: (user as User).id,
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
           razorpay_signature: response.razorpay_signature,
         };
         (async () => {
-          const response = await dispatch(verifyPayment(verifyData));
+          const response = await fetch(`api/payment/verifyPayment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(verifyData),
+          });
           console.log(response);
-          if (response.payload.success === true)
-            router.push("/payments/success");
+          if (response.ok) router.push("/payments/success");
           else router.push("/payments/failure");
         })();
       },
@@ -88,36 +93,32 @@ export default function Shoppingcart() {
       theme: { color: "#3399cc" },
     };
 
-    const rzp1 = new (window as any).Razorpay(options);
-    rzp1.open();
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
-  if (isLoading || ispaymentLoading) return <Spinner />;
   return (
     <>
       <Center
         display="flex"
-        height="100vh"
+        // height="100vh"
         margin="0"
         fontFamily="Sirin Stencil"
       >
-        {cart ? (
+        {data ? (
           <>
             <Grid>
-              <Text fontSize="4rem" marginBottom="2rem" textAlign="center">
+              <Text fontSize="4rem" textAlign="center">
                 Shopping Cart
               </Text>
-              <Tables cart={cart} total={total} />
+              <Tables cart={data.cart} total={total} />
               <Center>
                 <Button
-                  alignSelf="center"
-                  margin="3rem"
                   color="black"
                   fontWeight="bold"
                   backgroundColor="#FFB433"
                   padding="1rem 2rem"
                   borderRadius="4px"
-                  ml="1rem"
                   transition="0.3s ease-out"
                   _hover={{
                     bg: "pink",
@@ -132,8 +133,8 @@ export default function Shoppingcart() {
           </>
         ) : (
           <>
-            <Grid justifyContent="center" alignItems="center">
-              <Text fontSize="4rem">Your cart is empty!</Text>
+            <Grid justifyContent="center" alignItems="" >
+              <Text fontSize="4rem"  margin="5rem">Your cart is empty!</Text>
               <div
                 style={{
                   display: "flex",

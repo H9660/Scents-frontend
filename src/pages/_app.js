@@ -8,10 +8,12 @@ import { store } from "../slices/store";
 import Navbar from "@/Components/Navbar";
 import { Footer } from "@/Components/Footer";
 import "../app/globals.css";
+import ParticlesBackground from "../visuals/ParticlesBackground";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
   return (
     <Provider store={store}>
+      <ParticlesBackground />
       <ProvideChakra>
         <div className="flex flex-col min-h-screen">
           {router.pathname !== "/checkout" && <Navbar />}

@@ -1,33 +1,40 @@
 "use-client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import {toast} from 'react-toastify'
-import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Center, Grid, Image, Card, Button, Text, Box } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
-import { addToCart } from "../slices/authSlice";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { addToCart } from "../slices/authSlice.ts";
+import { User } from "@/slices/types.ts";
 export default function PerfumeContext() {
   const router = useRouter();
-  const dispatch = useDispatch();
   const params = useSearchParams();
   const name = params?.get("name");
   const url = params?.get("url");
   const price = params?.get("price");
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
   useEffect(() => {
     let user = localStorage.getItem("savedUser");
+
     if (user) user = JSON.parse(user);
     setUser(user);
   }, []);
+
   const selectPerfumeAndCheckout = () => {
-    const data = {
-      userId: user.id,
-      cart: {
-        [name]: 1,
-      },
-    };
-    dispatch(addToCart(data));
-    toast.success("Added to cart successfully");
+    if (!user) router.push("/login");
+    else {
+      const data = {
+        userId: (user as unknown as User).id,
+        cart: {
+          [name as string]: 1,
+        },
+      };
+
+      dispatch(addToCart(data));
+      toast.success("Added to cart successfully");
+    }
   };
 
   const HandleCheckout = () => {
@@ -50,7 +57,7 @@ export default function PerfumeContext() {
               position="relative"
               alignItems="center"
               rounded="md"
-              src={url}
+              src={url as string}
               alt="Dan Abramov"
               maxH="300px"
             />

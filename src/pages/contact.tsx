@@ -11,7 +11,7 @@ import {
 
 const Contact = () => {
   return (
-    <Center minH="80vh" bg="black" color="white" p={4} fontFamily="Sirin Stencil">
+    <Center minH="100vh" bg="black" color="white" p={4} fontFamily="Sirin Stencil">
       <Box
         width="min(90%, 1200px)"
         p={8}

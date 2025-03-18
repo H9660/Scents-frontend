@@ -1,18 +1,53 @@
-import { FaInstagram, FaEnvelope, FaPhone } from "react-icons/fa";
+"use client";
+import { Box, Container, Flex, Text, Button } from "@chakra-ui/react";
+import { FaInstagram, FaEnvelope, FaPhone } from "react-icons/fa6"; // Corrected import for newer version
+import { useRouter } from "next/navigation";
 
 export function Footer() {
+  const router = useRouter();
   return (
-    <footer className="mt-auto bg-gray-900 text-white py-4">
-      <div className="container mx-auto flex flex-col items-center space-y-2">
-        {/* Social Icons */}
-        <div className="flex space-x-6 text-gray-400 text-2xl">
-          <FaInstagram className="hover:text-white transition" />
-          <FaEnvelope className="hover:text-white transition" />
-          <FaPhone className="hover:text-white transition" />
-        </div>
+    <>
+  <Box
+    as="footer"
+    bg="gray.900"
+    py={4}
+    marginTop="5rem"
+    className="flex-grow"  
+    fontFamily="Sirin Stencil"
+    marginBottom="0"
+
+  >
+    <Container maxW="container.md" >
+      <Flex direction="column" align="center" gap={2}>
+        <Flex gap={6} color="gray.400">
+          <Button
+            as="a"
+            bg="transparent"
+            rel="noopener noreferrer"
+            onClick={() =>
+              router.push("https://www.instagram.com/hussian_lohawala/")
+            }
+          >
+            <FaInstagram />
+          </Button>
+          <Button onClick={() => router.push("/contact")}>
+            <FaEnvelope />
+          </Button>
+          <Button>
+            <FaPhone />
+          </Button>
+        </Flex>
+
         {/* Copyright */}
-        <p className="text-sm text-gray-500">&copy; 2025 Scents. All rights reserved.</p>
-      </div>
-    </footer>
+        <Text fontSize="sm" color="white" textAlign="center" margin="auto">
+          &copy; 2025 Scents. All rights reserved.
+        </Text>
+      </Flex>
+    </Container>
+  </Box>
+{/* </div> */}
+
+  </>
+  
   );
 }

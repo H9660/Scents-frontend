@@ -1,17 +1,20 @@
+"use client"
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { reset, clearError } from "../slices/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { reset, clearError } from "../slices/authSlice.ts";
+import { useSelector } from "react-redux";
 import { Input, Button, Box, VStack, Heading, Card } from "@chakra-ui/react";
-import { verifyotp } from "../slices/authSlice";
+import { verifyotp } from "../slices/authSlice.ts";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@/Components/ui/spinner";
+import { Spinner } from "../Components/ui/spinner.tsx";
+import { RootState } from '../slices/store.js'; // Import your RootState type
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 export default function OTPLogin() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [otp, setOtp] = useState("");
   const router = useRouter();
   const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
+    (state: RootState) => state.auth
   );
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export default function OTPLogin() {
       textAlign="center"
     >
       <Card.Body gap="4">
-        <VStack spacing={6}>
+        <VStack spaceX={6}>
           <Heading size="lg" color="gold">
             🔒 Secure Login
           </Heading>
@@ -83,7 +86,6 @@ export default function OTPLogin() {
             fontSize="2xl"
             letterSpacing="widest"
             borderColor="gold"
-            boderColor="white"
             _placeholder={{ color: "gray.400" }}
             _focus={{ borderColor: "gold" }}
           />

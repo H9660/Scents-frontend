@@ -1,6 +1,8 @@
 "use client";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "../services/authService";
+import { cartData } from "./types";
+import { userDataFormat } from "./types";
 const savedUser =
   typeof window !== "undefined" ? localStorage.getItem("savedUser") : null;
 
@@ -12,14 +14,16 @@ const initialState = {
   isSuccess: false,
   isLoading: false,
   otpWait: false,
-  message: "",
+  cartUpdated: false,
+  message: ""
 };
+
 
 export const login = createAsyncThunk(
   // name of an action
   "auth/login",
   // logic of the action creator
-  async (user, thunkAPI) => {
+  async (user: userDataFormat, thunkAPI) => {
     try {
       return await authService.login(user);
     } catch (error) {
@@ -39,7 +43,7 @@ export const register = createAsyncThunk(
   // name of an action
   "auth/register",
   // logic of the action creator
-  async (user, thunkAPI) => {
+  async (user: userDataFormat, thunkAPI) => {
     try {
       return await authService.register(user);
     } catch (error) {
@@ -82,7 +86,7 @@ export const addToCart = createAsyncThunk(
   // name of an action
   "auth/addtocart",
   // logic of the action creatorat
-  async (cart, thunkAPI) => {
+  async (cart: cartData, thunkAPI) => {
     try {
       return await authService.addtoCart(cart);
     } catch (error) {
@@ -135,6 +139,12 @@ export const authSlice = createSlice({
       state.isError = false;
       state.message = ""; // Clear only error-related state
     },
+    resetCartUpdated: (state)=>{
+      state.cartUpdated = false
+    },
+    clearOtpWait: (state)=>{
+      state.otpWait = false
+    }
   },
   extraReducers: (builder) => {
     // This is to handle the async nature of the asyncThunk function.
@@ -149,11 +159,11 @@ export const authSlice = createSlice({
         state.otpWait = true;
         state.isError = false;
       })
-      .addCase(register.rejected, (state) => {
+      .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.otpWait = false;
-        state.message = action.payload; // This will be the payload that would be set
+        state.message = JSON.stringify(action.payload); // This will be the payload that would be set
       })
       .addCase(login.pending, (state) => {
         state.isLoading = true;
@@ -164,11 +174,11 @@ export const authSlice = createSlice({
         state.isError = false;
         state.otpWait = true;
       })
-      .addCase(login.rejected, (state) => {
+      .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.otpWait = false;
-        state.message = action.payload;
+        state.message = JSON.stringify(action.payload);
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
@@ -184,19 +194,20 @@ export const authSlice = createSlice({
         state.otpWait = false;
         state.user = action.payload.user;
       })
-      .addCase(verifyotp.rejected, (state) => {
+      .addCase(verifyotp.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.payload;
+        state.message = JSON.stringify(action.payload);
         state.otpWait = false;
-        state.user = action.payload.user;
+        state.user = ""
       })
       .addCase(addToCart.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(addToCart.fulfilled, (state) => {
         state.isLoading = false;
+        state.cartUpdated = true;
       })
       .addCase(addToCart.rejected, (state) => {
         state.isLoading = false;
@@ -215,5 +226,5 @@ export const authSlice = createSlice({
 });
 
 // Exporting the reducer
-export const { reset, clearError } = authSlice.actions;
+export const { reset, clearError, resetCartUpdated, clearOtpWait } = authSlice.actions;
 export default authSlice.reducer;

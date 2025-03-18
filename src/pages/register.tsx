@@ -1,6 +1,195 @@
-import {Form} from "@/Components/ui/form"
-const register = () => {
-  return <Form name="Register and start shopping!" page="Register" btn="Register"/>
+"use client";
+import { toast } from "react-toastify";
+import { Input, Button, VStack, Box, Text } from "@chakra-ui/react";
+import { useState, useEffect } from "react";
+import { Spinner } from "@/Components/ui/spinner";
+import { clearError, clearOtpWait, register } from "@/slices/authSlice";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { RootState } from "@/slices/store";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+
+interface props {
+  name: string;
+  btn: string;
+  page: string;
+}
+
+const Register: React.FC<props> = ({ name, page, btn }) => {
+  const router = useRouter();
+  const [fadeOut, setFadeOut] = useState(false);
+
+  const [formData, setFormData] = useState({
+    userPhone: "",
+    userName: "",
+  });
+
+  const onChange = (e) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const { userName, userPhone } = formData;
+  const dispatch = useAppDispatch();
+  const { isLoading, otpWait, isError, message } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(message);
+      dispatch(clearError());
+    }
+  }, [isError, dispatch, message]);
+
+  const handleClick = () => {
+    if (userPhone === "" || userName==="") {
+      toast.error("Please fill all the details.");
+      return;
+    }
+    dispatch(register(formData));
+    if (isError) toast.error(message);
+  };
+
+  const handleClose = () => {
+    dispatch(clearOtpWait())
+    setFadeOut(true);
+    setTimeout(() => router.back(), 300); // Delay to match fade-out animation
+  };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  if (otpWait) {
+    router.push("/otpverify");
+  }
+
+  return (
+    <>
+      <Box
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        zIndex="1000"
+        className={fadeOut ? "fade-out" : ""}
+      >
+        {/* Backdrop with blur */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.600"
+          backdropFilter="blur(8px)"
+          onClick={handleClose}
+        />
+
+        {/* Modal Content */}
+        <Box
+          bg="gray.900"
+          color="white"
+          p={6}
+          rounded="md"
+          fontFamily="Sirin Stencil"
+          w={{ base: "90%", md: "500px" }}
+          mx="auto"
+          border="1px solid"
+          borderColor="gray.700"
+          fontSize="2rem"
+          zIndex="1001"
+          position="relative"
+        >
+          {/* Close button */}
+          <Button
+            position="absolute"
+            top="10px"
+            right="10px"
+            size="sm"
+            onClick={handleClose}
+            bg="transparent"
+            _hover={{ bg: "whiteAlpha.200" }}
+          >
+            ✕
+          </Button>
+
+          <Text
+            textAlign="center"
+            style={{ fontWeight: "bold", marginBottom: "1.5rem" }}
+          >
+            {name}
+          </Text>
+
+          <VStack spaceY={4} align="stretch">
+              <Box>
+                <Text fontSize="sm" mb={1}>
+                  Name
+                </Text>
+                <Input
+                  bg="gray.800"
+                  borderColor="gray.600"
+                  onChange={onChange}
+                  name="userName"
+                  value={userName}
+                />
+              </Box>
+            <Box>
+              <Text fontSize="sm" mb={1}>
+                Phone Number
+              </Text>
+              <Input
+                bg="gray.800"
+                borderColor="gray.600"
+                onChange={onChange}
+                name="userPhone"
+                value={userPhone}
+              />
+            </Box>
+            <Button
+              alignItems="center"
+              border="1px white solid"
+              colorScheme="whiteAlpha"
+              margin="auto"
+              padding="1.5rem"
+              width="30%"
+              _hover={{
+                color: "black",
+                bg: "pink",
+              }}
+              onClick={handleClick}
+            >
+              Register
+            </Button>
+          </VStack>
+        </Box>
+      </Box>
+
+      {/* Add CSS for fade-out effect */}
+      <style jsx>{`
+        .fade-out {
+          animation: fadeOut 0.3s forwards;
+        }
+
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+        }
+      `}</style>
+    </>
+  );
 };
 
-export default register;
+export default Register

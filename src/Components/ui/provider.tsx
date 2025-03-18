@@ -3,10 +3,9 @@
 import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
 import {
   ColorModeProvider,
-  type ColorModeProviderProps,
 } from "./color-mode"
 
-export function ProvideChakra(props: ColorModeProviderProps) {
+export function ProvideChakra(props) {
   return (
     <ChakraProvider value={defaultSystem}>
       <ColorModeProvider {...props} />
