@@ -1,5 +1,4 @@
 import { Table } from "@chakra-ui/react";
-import { memo } from "react";
 import { TablesProps } from "@/slices/types";
 const Tables = ({ cart, total }: TablesProps)=> {
   return (
@@ -97,4 +96,4 @@ const Tables = ({ cart, total }: TablesProps)=> {
   );
 };
 
-export default memo(Tables)
+export default Tables

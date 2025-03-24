@@ -12,6 +12,7 @@ declare global {
     Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
   }
 }
+
 export default function Shoppingcart() {
   const router = useRouter();
   const [user, setUser] = useState({});
@@ -33,13 +34,14 @@ export default function Shoppingcart() {
   );
 
   useEffect(() => {
-      const user = JSON.parse(localStorage.getItem("savedUser") || "");
-      if (!user) {
+    const user = JSON.parse(localStorage.getItem("savedUser") || "{}"); // Use "{}" instead of ""
+    if (!user.id) {
         router.push("/login");
         return;
-      }
-      setUser(user as string);
-  }, [router]);
+    }
+    setUser(user as string);
+}, [router]);
+
 
   if (isLoading) return <Spinner />;
   const handlePayment = async () => {

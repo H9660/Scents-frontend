@@ -1,6 +1,6 @@
 export interface userDataFormat {
-  userPhone?: string;
-  userName: string;
+  userPhone: string;
+  userName?: string;
 }
 
 export interface cartData {

@@ -31,7 +31,6 @@ const Navbar = () => {
   const navUrls = [
     { label: "Home", url: "/home" },
     { label: "Cart", url: "/shoppingcart" },
-    { label: "Contact", url: "/contact" },
     { label: "Login", url: "/login" },
   ];
   useEffect(() => {

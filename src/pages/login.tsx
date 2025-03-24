@@ -1,28 +1,24 @@
 "use client";
 import { toast } from "react-toastify";
-import { Input, Button, VStack, Box, Text } from "@chakra-ui/react";
+import { Input, Button, VStack, Box, Text, Spinner } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { Spinner } from "@/Components/ui/spinner";
 import { clearError, clearOtpWait } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
-import { login, register } from "@/slices/authSlice";
+import { login } from "@/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/slices/store";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 
 interface props {
   name: string;
-  btn: string;
-  page: string;
 }
 
-const Login: React.FC<props> = ({ name, page }) => {
+const Login: React.FC<props> = ({ name }) => {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
 
   const [formData, setFormData] = useState({
     userPhone: "",
-    userName: "",
   });
 
   const onChange = (e) => {
@@ -32,7 +28,7 @@ const Login: React.FC<props> = ({ name, page }) => {
     }));
   };
 
-  const { userName, userPhone } = formData;
+  const { userPhone } = formData;
   const dispatch = useAppDispatch();
   const { isLoading, otpWait, isError, message } = useSelector(
     (state: RootState) => state.auth
@@ -45,31 +41,23 @@ const Login: React.FC<props> = ({ name, page }) => {
     }
   }, [isError, dispatch, message]);
 
-  const handleClick = () => {
-    if (userPhone === "") {
-      toast.error("Please fill all the details.");
+  const handleClick = async () => {
+    if (userPhone.length!==10) {
+      toast.error("Phone number must have 10 digits.");
       return;
     }
-    if (page === "Register" && userName === "") {
-      toast.error("Please fill all the details.");
-      return;
-    }
-    if (page == "Login") dispatch(login(formData));
-    else dispatch(register(formData));
+    await dispatch(login(formData));
     if (isError) toast.error(message);
   };
 
   const handleClose = () => {
-    dispatch(clearOtpWait())
+    dispatch(clearOtpWait());
     setFadeOut(true);
-    setTimeout(() => router.back(), 300); // Delay to match fade-out animation
+    setTimeout(() => router.back(), 300);
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
-
   if (otpWait) {
+    sessionStorage.setItem("prevPath", window.location.pathname);
     router.push("/otpverify");
   }
 
@@ -87,34 +75,32 @@ const Login: React.FC<props> = ({ name, page }) => {
         zIndex="1000"
         className={fadeOut ? "fade-out" : ""}
       >
-        {/* Backdrop with blur */}
         <Box
           position="absolute"
           top="0"
           left="0"
           right="0"
           bottom="0"
-          bg="blackAlpha.600"
-          backdropFilter="blur(8px)"
+          bgGradient="linear(to-r, blackAlpha.700, blackAlpha.400)"
+          backdropFilter="blur(12px)"
           onClick={handleClose}
         />
 
-        {/* Modal Content */}
         <Box
           bg="gray.900"
           color="white"
           p={6}
-          rounded="md"
+          rounded="2xl"
           fontFamily="Sirin Stencil"
           w={{ base: "90%", md: "500px" }}
           mx="auto"
           border="1px solid"
           borderColor="gray.700"
+          boxShadow="xl"
           fontSize="2rem"
           zIndex="1001"
           position="relative"
         >
-          {/* Close button */}
           <Button
             position="absolute"
             top="10px"
@@ -142,31 +128,33 @@ const Login: React.FC<props> = ({ name, page }) => {
               <Input
                 bg="gray.800"
                 borderColor="gray.600"
+                _focus={{ borderColor: "pink.400", boxShadow: "0 0 8px pink" }}
                 onChange={onChange}
                 name="userPhone"
                 value={userPhone}
               />
             </Box>
-            <Button
+            <Box
+              display="flex"
               alignItems="center"
+              justifyContent="center"
               border="1px white solid"
-              colorScheme="whiteAlpha"
+              color="white"
               margin="auto"
-              padding="1.5rem"
-              width="30%"
+              // padding="1rem"
+              width="25%"
               _hover={{
-                color: "black",
-                bg: "pink",
+                bgGradient: "linear(to-r, pink.400, pink.600)",
+                color: "white",
               }}
               onClick={handleClick}
             >
-              Login
-            </Button>
+              {isLoading ? <Spinner size="sm" color="white" /> : "Login"}
+            </Box>
           </VStack>
         </Box>
       </Box>
 
-      {/* Add CSS for fade-out effect */}
       <style jsx>{`
         .fade-out {
           animation: fadeOut 0.3s forwards;
@@ -186,4 +174,4 @@ const Login: React.FC<props> = ({ name, page }) => {
   );
 };
 
-export default Login
+export default Login;

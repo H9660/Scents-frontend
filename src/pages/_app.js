@@ -11,14 +11,15 @@ import "../app/globals.css";
 import ParticlesBackground from "../visuals/ParticlesBackground";
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
+  const noOtpPages = ["/register", "/login", "/otpverify"]
   return (
     <Provider store={store}>
       <ParticlesBackground />
       <ProvideChakra>
         <div className="flex flex-col min-h-screen">
-          {router.pathname !== "/checkout" && <Navbar />}
+          <Navbar />
           <Component {...pageProps} />
-          {router.pathname !== "/checkout" && <Footer />}
+          {noOtpPages.includes(router.pathname) ? null: <Footer/>}
         </div>
       </ProvideChakra>
       <ToastContainer />

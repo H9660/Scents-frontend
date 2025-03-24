@@ -11,11 +11,9 @@ import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 
 interface props {
   name: string;
-  btn: string;
-  page: string;
 }
 
-const Register: React.FC<props> = ({ name, page, btn }) => {
+const Register: React.FC<props> = ({ name}) => {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
 
