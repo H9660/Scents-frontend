@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useLayoutEffect } from "react";
-import { NavUrl, defaultUser, User } from "@/slices/types.ts";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import { defaultUser, User } from "@/slices/types.ts";
 import {
   Box,
   Image,
@@ -28,33 +28,27 @@ import {
 } from "@/Components/ui/drawer";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
-  const [user, setUser] = useState<User>(defaultUser)
-  const [navUrls, setnavUrls] = useState<NavUrl[]>([
+  const [user, setUser] = useState<User>(defaultUser);
+  const navUrls = [
     { label: "Home", url: "/home" },
     { label: "Cart", url: "/shoppingcart" },
-    { label: "Loading...", url: "#" },
-  ]);
-
-  const router = useRouter();
-  useEffect(()=>{
-    const currUser = JSON.parse(localStorage.getItem('savedUser') || "")
-    setUser(currUser)
-  }, [])
-  
-  useLayoutEffect(() => {
-    setnavUrls((prevNavUrls) => {
-      const updatedNavUrls = [...prevNavUrls];
-      updatedNavUrls[2] = user?.name
-        ? { label: user.name.split(" ")[0], url: `/${user.name}` }
-        : { label: "Login", url: "/login" };
-      return updatedNavUrls;
-    });
-  }, []);
+  ];
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    // Trigger the fade-in effect after the component mounts
+    const timer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(timer);
+  }, []);
+  const router = useRouter();
+  useEffect(() => {
+    const currUser = JSON.parse(localStorage.getItem("savedUser") || "");
+    setUser(currUser);
+  }, []);
+
+  useLayoutEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 800) setSmall(true);
-      else setSmall(false);
+      setSmall(window.innerWidth < 800);
     };
 
     handleResize();
@@ -62,15 +56,9 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize); // Cleanup on unmount
   }, []);
 
-  const navigate = (url: string, label: string) => {
-    if(label!="Home" && label!="Cart")
-    {{
-      if(user)
-    router.push(`/users/${user.name}`);
-    else router.push("login");}
-  }
-  else router.push(url)
-}
+  const navigate = (url: string) => {
+    router.push(url);
+  };
   return (
     <>
       <Container marginTop="2rem" fontFamily="Sirin Stencil">
@@ -104,17 +92,28 @@ const Navbar = () => {
             </Heading>
           </Box>
 
-          {/* Hamburger Icon (Mobile) */}
           {!small && (
-            <Box display={{ md: "flex" }} gap={10} fontSize="30px">
+            <Box
+              display={{ base: "none", md: "flex" }}
+              gap={10}
+              fontSize="30px"
+            >
               {navUrls.map((link) => (
-                <Button
-                  key={link.url}
-                  onClick={()=>navigate(link.url, link.label)}
-                >
+                <Button key={link.url} onClick={() => navigate(link.url)}>
                   {link.label}
                 </Button>
               ))}
+
+              <Button
+                key={user.name}
+                onClick={() => {
+                  user.name
+                    ? navigate(`/users/${user.name}`)
+                    : navigate("/login");
+                }}
+              >
+                {user.name ? user.name.split(" ")[0] : "Login"}
+              </Button>
             </Box>
           )}
 
@@ -128,7 +127,13 @@ const Navbar = () => {
                     variant="outline"
                     size="sm"
                   >
-                    <Bars3Icon />
+                      <Box
+      opacity={isVisible ? 1 : 0}
+      transition="opacity 0.2s ease-in"
+      display="inline-block"
+    >
+      <Bars3Icon />
+    </Box>
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent
@@ -147,7 +152,7 @@ const Navbar = () => {
                             key={link.url}
                             onClick={() => {
                               setSmall(false);
-                              navigate(link.url, link.label)
+                              navigate(link.url);
                             }}
                             w="full"
                             _hover={{ bg: "pink", color: "black" }}
@@ -162,6 +167,19 @@ const Navbar = () => {
                           />
                         </>
                       ))}
+                      <Button
+                        key={user.name}
+                        onClick={() => {
+                          setSmall(false);
+                          user.name
+                            ? navigate(`/users/${user.name}`)
+                            : navigate("/login");
+                        }}
+                        w="full"
+                        _hover={{ bg: "pink", color: "black" }}
+                      >
+                        {user.name ? user.name.split(" ")[0] : "Login"}
+                      </Button>
                     </VStack>
                   </DrawerBody>
                   <DrawerFooter>

@@ -11,7 +11,6 @@ const getUser = async (id) => {
 
 export default function UserAccount() {
   const [activeTab, setActiveTab] = useState("details");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [curruser, setcurrUser] = useState({});
 
   useEffect(() => {
