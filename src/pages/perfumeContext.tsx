@@ -19,8 +19,7 @@ export default function PerfumeContext() {
   const dispatch = useAppDispatch();
   const {currPerfume} = useSelector((state: RootState)=>state.perfumes)
   useEffect(() => {
-    let user = localStorage.getItem("savedUser");
-    if (user) user = JSON.parse(user);
+    const user = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(user);
   }, []);
 

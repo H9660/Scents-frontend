@@ -16,8 +16,8 @@ export default function Shoppingpage({ perfumesData = [] }) {
   const [user, setUser] = useState<User>(defaultUser)
   const { isLoading } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("savedUser") || "");
-    setUser(user);
+    const user = JSON.parse(localStorage.getItem("savedUser") || "null");
+    setUser(user);  
   }, []);
 
   if (isLoading) {

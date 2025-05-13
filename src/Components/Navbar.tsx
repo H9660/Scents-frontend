@@ -42,7 +42,7 @@ const Navbar = () => {
   }, []);
   const router = useRouter();
   useEffect(() => {
-    const currUser = JSON.parse(localStorage.getItem("savedUser") || "");
+    const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(currUser);
   }, []);
 
