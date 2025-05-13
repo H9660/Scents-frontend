@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { defaultUser, User } from "@/slices/types.ts";
 import {
   Box,
@@ -105,11 +105,10 @@ const Navbar = () => {
               ))}
 
               <Button
-                key={user.name}
+                key={user?.name}
                 onClick={() => {
-                  user.name
-                    ? navigate(`/users/${user.name}`)
-                    : navigate("/login");
+                  if (user?.name) navigate(`/users/${user?.name}`);
+                  else navigate("/login");
                 }}
               >
                 {user.name ? user.name.split(" ")[0] : "Login"}
@@ -127,13 +126,13 @@ const Navbar = () => {
                     variant="outline"
                     size="sm"
                   >
-                      <Box
-      opacity={isVisible ? 1 : 0}
-      transition="opacity 0.2s ease-in"
-      display="inline-block"
-    >
-      <Bars3Icon />
-    </Box>
+                    <Box
+                      opacity={isVisible ? 1 : 0}
+                      transition="opacity 0.2s ease-in"
+                      display="inline-block"
+                    >
+                      <Bars3Icon />
+                    </Box>
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent
@@ -168,17 +167,16 @@ const Navbar = () => {
                         </>
                       ))}
                       <Button
-                        key={user.name}
+                        key={user?.name}
                         onClick={() => {
                           setSmall(false);
-                          user.name
-                            ? navigate(`/users/${user.name}`)
-                            : navigate("/login");
+                          if (user?.name) navigate(`/users/${user?.name}`);
+                          else navigate("/login");
                         }}
                         w="full"
                         _hover={{ bg: "pink", color: "black" }}
                       >
-                        {user.name ? user.name.split(" ")[0] : "Login"}
+                        {user?.name ? user.name.split(" ")[0] : "Login"}
                       </Button>
                     </VStack>
                   </DrawerBody>
