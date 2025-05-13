@@ -7,18 +7,17 @@ import { Spinner } from "@/Components/ui/spinner.tsx";
 import { addToCart } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
-import { perfumeData } from "@/slices/types.ts";
+import { defaultUser, perfumeData } from "@/slices/types.ts";
 import { User } from "@/slices/types.ts";
 import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState<User>(defaultUser)
   const { isLoading } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    let user = localStorage.getItem("savedUser");
-    if (user) user = JSON.parse(user);
-    setUser(user as string);
+    const user = JSON.parse(localStorage.getItem("savedUser") || "null");
+    setUser(user);  
   }, []);
 
   if (isLoading) {
@@ -28,13 +27,12 @@ export default function Shoppingpage({ perfumesData = [] }) {
     <>
       <div className="mainDiv">
         <Box
-          fontFamily="Sirin Stencil"
-          margin="auto 10%"
+          fontFamily="Great Vibes"
           textAlign="center"
           color="white"
-          fontSize="8xl"
-          borderBottom="4px solid gray"
-          marginBottom={20}
+          fontSize={{md: "8xl", base: "6xl"}}
+          marginTop={{base: "5%", md: "4%", lg: "3%"}}
+          marginBottom={{base: "5%", md: "4%", lg: "3%"}}
         >
           Our latest arrivals
         </Box>
@@ -43,10 +41,9 @@ export default function Shoppingpage({ perfumesData = [] }) {
           margin="auto 2rem"
           justifyContent="center"
           width="clamp(200px,auto, 600px)"
-          // maxWidth="1400px"
           flexWrap="wrap"
           templateColumns={{ base: "1fr", md: "1fr 1fr", lg: "1fr 1fr 1fr" }}
-          gap={8} // Increased gap for better spacing
+          gap={8}
         >
           {perfumesData.map((link: perfumeData) => (
             <Box
@@ -85,13 +82,11 @@ export default function Shoppingpage({ perfumesData = [] }) {
 
                 <Box
                   display="flex"
-                  justifyContent="center"
+                  justifyContent="space-between"
                   alignItems="center"
-                  gap={7}
-                  mt={2}
-                  spaceY={5}
+                  mt={7}
                 >
-                  <Text fontSize={{base: "2xl", md: "3xl" }}fontWeight="bold" color="white">
+                  <Text fontSize="2xl" fontWeight="bold" color="white">
                     ₹ {link.price}
                   </Text>
                   <Button
@@ -103,9 +98,9 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     padding="1rem"
                     fontSize="1rem"
                     _hover={{ bg: "white", color: "black" }}
-                    onClick={() => {
+                    onClick={async () => {
                       if (!user) return router.push("/login");
-                      dispatch(
+                      await dispatch(
                         addToCart({
                           userId: (user as User).id,
                           cart: { [link.name]: 1 },

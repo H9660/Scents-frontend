@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
 import { User } from "@/slices/types.ts";
-import { RazorpayOptions, RazorpayInstance } from "@/slices/types.ts";
+import { RazorpayOptions, RazorpayInstance, data } from "@/slices/types.ts";
 import Image from "next/image";
 import { createTransaction } from 
 "@/utils/paymentUtil";
@@ -321,7 +321,7 @@ export default function CheckoutPage() {
                   className="flex py-3 sm:py-4 md:py-6 items-center"
                 >
                   <Image
-                    src={idx.imageUrl}
+                    src={(idx as data).imageUrl}
                     alt={ele}
                     width={60}
                     height={60}
@@ -332,10 +332,10 @@ export default function CheckoutPage() {
                       {ele}
                     </p>
                     <p className="text-sm sm:text-base md:text-lg">
-                      ₹ {idx.price}
+                      ₹ {(idx as data).price}
                     </p>
                     <p className="text-xs sm:text-sm md:text-md text-gray-400">
-                      Qty: {idx.quantity}
+                      Qty: {(idx as data).quantity}
                     </p>
                   </div>
                 </li>

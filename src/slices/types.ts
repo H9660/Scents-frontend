@@ -91,11 +91,6 @@ export type cartDataProps = {
   total: number;
 };
 
-export type NavUrl = {
-  label: string, 
-  url: string
-}
-
 export const defaultUser = {
     id: "",
     name: "",

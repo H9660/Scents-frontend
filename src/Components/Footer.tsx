@@ -61,7 +61,7 @@ Discover fragrances that leave a lasting impression with every spritz.
           align="center"
           fontSize="xl"
         >
-          <Text>&copy; 2025 Scentdazzles. All rights reserved.</Text>
+          <Text>&copy; 2025 Scentdazzle. All rights reserved.</Text>
           <HStack spaceX={4}>
             <Link href="#" _hover={{ color: "white" }}>
               Privacy Policy
