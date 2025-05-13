@@ -1,6 +1,6 @@
 import { current } from "@reduxjs/toolkit";
 
-const API_URL = process.env.LOCAL_KEY;
+const API_URL = process.env.API_KEY;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
