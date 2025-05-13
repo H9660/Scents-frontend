@@ -1,6 +1,6 @@
 "use client";
 import { toast } from "react-toastify";
-import { Input, Button, VStack, Box, Text, Spinner } from "@chakra-ui/react";
+import { Input, Button, VStack, Box, Text, Grid } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { clearError, clearOtpWait } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
@@ -8,7 +8,7 @@ import { login } from "@/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/slices/store";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
-
+import { toggleCartDrawer } from "@/slices/cartSlice";
 interface props {
   name: string;
 }
@@ -30,7 +30,7 @@ const Login: React.FC<props> = ({ name }) => {
 
   const { userPhone } = formData;
   const dispatch = useAppDispatch();
-  const { isLoading, otpWait, isError, message } = useSelector(
+  const { otpWait, isError, message } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -52,8 +52,9 @@ const Login: React.FC<props> = ({ name }) => {
 
   const handleClose = () => {
     dispatch(clearOtpWait());
+    dispatch(toggleCartDrawer())
     setFadeOut(true);
-    setTimeout(() => router.back(), 300);
+    router.push("/home")
   };
 
   if (otpWait) {
@@ -122,7 +123,7 @@ const Login: React.FC<props> = ({ name }) => {
 
           <VStack spaceY={4} align="stretch">
             <Box>
-              <Text fontSize="sm" mb={1}>
+              <Text fontSize="lg" mb={1}>
                 Phone Number
               </Text>
               <Input
@@ -134,23 +135,43 @@ const Login: React.FC<props> = ({ name }) => {
                 value={userPhone}
               />
             </Box>
+            <Grid templateColumns="1fr 1fr">
             <Box
               display="flex"
               alignItems="center"
               justifyContent="center"
               border="1px white solid"
+              borderRadius="1rem"
               color="white"
-              margin="auto"
-              // padding="1rem"
-              width="25%"
+              cursor="pointer"
+              transition="0.2s ease-out"
+              margin="1rem"
               _hover={{
-                bgGradient: "linear(to-r, pink.400, pink.600)",
-                color: "white",
+                bg: "pink",
+                color: "black",
               }}
               onClick={handleClick}
             >
-              {isLoading ? <Spinner size="sm" color="white" /> : "Login"}
+               Login
             </Box>
+            <Box
+              display="flex"
+              justifyContent="center"
+              border="1px white solid"
+              color="white"
+              borderRadius="1rem"
+              margin="1rem"
+              transition="0.2s ease-out"
+              cursor="pointer"
+              _hover={{
+                bg: "pink",
+                color: "black",
+              }}
+              onClick={()=>router.push("/register")}
+            >
+               Sign Up
+            </Box>
+            </Grid>
           </VStack>
         </Box>
       </Box>

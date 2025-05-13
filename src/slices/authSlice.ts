@@ -15,6 +15,7 @@ const initialState = {
   isLoading: false,
   otpWait: false,
   cartUpdated: false,
+  userCart: [],
   message: ""
 };
 

@@ -40,7 +40,7 @@
     "**/*.tsx",
     "next-env.d.ts",
     ".next/types/**/*.ts"
-],
+, "src/pages/checkout.js", "src/pages/users/[username].js", "src/pages/api/emails/send2.jsx"],
   "exclude": [
     "node_modules"
   ]

@@ -4,39 +4,72 @@ import {
   Container,
   Flex,
   Text,
-  Button,
+  Link,
+  VStack,
+  HStack,
+  Separator,
 } from "@chakra-ui/react";
-import { FaInstagram, FaEnvelope, FaPhone } from "react-icons/fa6"; // Corrected import for newer version
-import { useRouter } from "next/navigation";
-
 export function Footer() {
-  const router = useRouter();
-
   return (
-    <Box as="footer" bg="gray.900" py={4} mt="5rem" mb="0rem" fontFamily="Sirin Stencil">
-      <Container maxW="container.md">
-        <Flex direction="column" align="center" gap={2}>
-          {/* Social Icons */}
-          <Flex gap={6} color="gray.400">
-            <Button
-              onClick={() =>
-                router.push("https://www.instagram.com/hussian_lohawala/")
-              }
-            >
-              <FaInstagram />
-            </Button>
-            <Button onClick={() => router.push("/contact")}>
-              <FaEnvelope />
-            </Button>
-            <Button>
-              <FaPhone />
-            </Button>
-          </Flex>
+    <Box marginTop="2rem" as="footer" bg="gray.900" color="gray.400" py={10} px={6} fontFamily="Sirin Stencil">
+      <Container maxW="container.xl">
+        <Flex
+          direction="row"
+          justify="space-between"
+          gap={10}
+        >
+          
+          {/* Branding & Description */}
+          <VStack align="start" spaceY={3}>
+          
+            <Text fontSize="3xl" fontWeight="bold" color="white" fontFamily="Great Vibes">
+           Scentdazzle
+            </Text>
+            <Text fontSize={{base: "sm", md:"2xl"}}>
+            Experience captivating scents crafted to enchant your senses.
+Discover fragrances that leave a lasting impression with every spritz.
+            </Text>
+          </VStack>
 
-          {/* Copyright */}
-          <Text fontSize="sm" color="white" textAlign="center" margin="auto">
-            &copy; 2025 Scents. All rights reserved.
-          </Text>
+          <VStack align="start" spaceY={2} fontSize="xl">
+            <Text fontWeight="bold" color="white">
+              Company
+            </Text>
+            {["About", "Pricing", "Blog", "Careers"].map((link) => (
+              <Link key={link} href="#" _hover={{ color: "white" }}>
+                {link}
+              </Link>
+            ))}
+          </VStack>
+
+          <VStack align="start" spaceY={2} fontSize="xl">
+            <Text fontWeight="bold" color="white">
+              Help
+            </Text>
+            {["FAQ", "Contact", "Privacy", "Terms"].map((link) => (
+              <Link key={link} href="#" _hover={{ color: "white" }}>
+                {link}
+              </Link>
+            ))}
+          </VStack>
+        </Flex>
+
+        <Separator margin="1rem" width="100%" variant="dotted" borderColor="gray" borderWidth="0.1px" />
+        <Flex
+          justify="space-between"
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          fontSize="xl"
+        >
+          <Text>&copy; 2025 Scentdazzles. All rights reserved.</Text>
+          <HStack spaceX={4}>
+            <Link href="#" _hover={{ color: "white" }}>
+              Privacy Policy
+            </Link>
+            <Link href="#" _hover={{ color: "white" }}>
+              Terms of Service
+            </Link>
+          </HStack>
         </Flex>
       </Container>
     </Box>

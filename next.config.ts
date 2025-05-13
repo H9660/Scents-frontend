@@ -1,4 +1,6 @@
-const API_URL = process.env.API_KEY;
+import { current } from "@reduxjs/toolkit";
+
+const API_URL = process.env.LOCAL_KEY;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -8,6 +10,10 @@ const nextConfig = {
         source: "/api/:path*",
         destination: `${API_URL}api/:path*`,
       },
+      {
+        source: "/sendemail",
+        destination: "/api/emails/send"
+      }
     ];
   },
   async redirects() {
@@ -18,7 +24,12 @@ const nextConfig = {
         permanent: true, // 301 redirect for SEO
       },
     ];
-  }
+  },
+
+  images: {
+    domains: [process.env.IMAGE_BUCKET],
+  },
 };
 
 module.exports = nextConfig;
+

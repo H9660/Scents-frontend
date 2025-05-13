@@ -9,7 +9,7 @@ import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { perfumeData } from "@/slices/types.ts";
 import { User } from "@/slices/types.ts";
-
+import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -62,13 +62,11 @@ export default function Shoppingpage({ perfumesData = [] }) {
               }}
             >
               <Image
-                objectFit="contain" // Ensures the image fits without being cut
+                objectFit="contain"
                 rounded="md"
                 src={link.imageUrl}
                 alt={link.name}
-                maxH="300px"
-                // alignSelf="center"
-                {...(link.name === "Dylin Blue" && { marginTop: "1.5rem" })} 
+                maxH="200px"
                 width="100%"
               />
 
@@ -130,11 +128,12 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     width="33%"
                     _hover={{ bg: "pink", color: "black" }}
                     onClick={() =>
+                      {dispatch(setCurrentPerfume(link))
                       router.push(
                         `/perfumeContext?name=${link.name}&url=${
                           link.imageUrl
                         }&price=${link.price || 1000}`
-                      )
+                      )}
                     }
                   >
                     Buy now

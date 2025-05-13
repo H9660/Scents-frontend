@@ -8,6 +8,13 @@ export interface cartData {
   cart: Record<string, number>;
 }
 
+export interface emailData { 
+  name: string;
+  email: string;
+  transactionId: string;
+  cartdata: NumberRecord;
+}
+
 export interface perfumeUpdateDataFormat {
   name: string;
   price?: number;
@@ -20,6 +27,10 @@ export type User = {
   id: string;
   name: string;
   phone: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  address: string;
+  totalCartprice: number;
 };
 
 export type perfumeData = {
@@ -49,7 +60,6 @@ export interface RazorpayOptions {
   handler: (response: RazorpaySuccessResponse) => void
   prefill?: {
     name: string;
-    email: string;
     contact: string;
   };
   theme?: {
@@ -71,11 +81,27 @@ export interface paymentApiResponse {
 }
 
 export type data = {
+  imageUrl: string,
   price: number;
   quantity: number;
 };
 export type NumberRecord = Record<string, data>;
-export type TablesProps = {
+export type cartDataProps = {
   cart: NumberRecord;
   total: number;
 };
+
+export type NavUrl = {
+  label: string, 
+  url: string
+}
+
+export const defaultUser = {
+    id: "",
+    name: "",
+    phone: "",
+    createdAt: "",
+    updatedAt: "",
+    address: "",
+    totalCartprice: 0,
+}

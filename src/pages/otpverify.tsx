@@ -7,25 +7,21 @@ import {
   VStack,
   Heading,
 } from "@chakra-ui/react";
-import { useDisclosure } from "@chakra-ui/react";
 import { toast } from "react-toastify";
 import { clearError, clearOtpWait, verifyotp, reset } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { RootState } from "@/slices/store";
 import { useRouter } from "next/router";
-
 interface props {
   name: string;
 }
 
-const Login: React.FC<props> = ({ name }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const Login: React.FC<props> = () => {
   const [otp, setOtp] = useState("");
-
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { isLoading, otpWait, isError, isSuccess, message } = useSelector(
+  const { otpWait, isError, isSuccess, message } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -37,7 +33,7 @@ const Login: React.FC<props> = ({ name }) => {
     if (!otpWait) {
       router.push("/login");
     }
-  }, [isError, dispatch, message]);
+  });
 
   const handleOtpSubmit = () => {
     if (otp.length !== 6) return;
@@ -66,7 +62,7 @@ const Login: React.FC<props> = ({ name }) => {
 
   return (
     <>
-      {(isOpen || otpWait) && (
+      {otpWait && (
         <Box
           position="fixed"
           top="0"
@@ -100,7 +96,7 @@ const Login: React.FC<props> = ({ name }) => {
               ✕
             </Button>
 
-            <VStack spacing={4} align="stretch">
+            <VStack spaceY={4} align="stretch">
               <Heading size="md" textAlign="center">
                 Enter OTP
               </Heading>

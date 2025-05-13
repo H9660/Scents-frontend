@@ -1,6 +1,6 @@
 "use client";
 import { toast } from "react-toastify";
-import { Input, Button, VStack, Box, Text } from "@chakra-ui/react";
+import { Input, Button, VStack, Box, Text, Grid } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/Components/ui/spinner";
 import { clearError, clearOtpWait, register } from "@/slices/authSlice";
@@ -41,7 +41,7 @@ const Register: React.FC<props> = ({ name}) => {
       dispatch(clearError());
     }
   }, [isError, dispatch, message]);
-
+                                          
   const handleClick = () => {
     if (userPhone === "" || userName==="") {
       toast.error("Please fill all the details.");
@@ -128,7 +128,7 @@ const Register: React.FC<props> = ({ name}) => {
 
           <VStack spaceY={4} align="stretch">
               <Box>
-                <Text fontSize="sm" mb={1}>
+                <Text fontSize="lg" mb={1}>
                   Name
                 </Text>
                 <Input
@@ -140,7 +140,7 @@ const Register: React.FC<props> = ({ name}) => {
                 />
               </Box>
             <Box>
-              <Text fontSize="sm" mb={1}>
+              <Text fontSize="lg" mb={1}>
                 Phone Number
               </Text>
               <Input
@@ -151,21 +151,41 @@ const Register: React.FC<props> = ({ name}) => {
                 value={userPhone}
               />
             </Box>
-            <Button
+            <Grid templateColumns="1fr 1fr">
+            <Box
+              display="flex"
               alignItems="center"
+              justifyContent="center"
               border="1px white solid"
-              colorScheme="whiteAlpha"
-              margin="auto"
-              padding="1.5rem"
-              width="30%"
+              borderRadius="1rem"
+              color="white"
+              margin="1rem"
               _hover={{
-                color: "black",
-                bg: "pink",
+                bgGradient: "linear(to-r, pink.400, pink.600)",
+                color: "white",
+              }}
+              onClick={()=>router.push("/login")}
+            >
+               Login
+            </Box>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              border="1px white solid"
+              borderRadius="1rem"
+              color="white"
+              cursor="pointer"
+              margin="1rem"
+              _hover={{
+                bgGradient: "linear(to-r, pink.400, pink.600)",
+                color: "white",
               }}
               onClick={handleClick}
             >
-              Register
-            </Button>
+               Sign Up
+            </Box>
+            </Grid>
           </VStack>
         </Box>
       </Box>

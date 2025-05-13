@@ -1,11 +1,12 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import perfumeService from "../services/perfumeService.ts";
 import { perfumeData, perfumeUpdateDataFormat} from "./types";
 const defaultperfume = {
   name: "",
   price: 500,
   quantity: "SMALL",
-  imageUrl: ""
+  imageUrl: "",
+  discription: ""
 };
 
 const initialState = {
@@ -15,6 +16,7 @@ const initialState = {
   isSuccess: false,
   perfumeLoading: false,
   message: "",
+  currPerfume: {...defaultperfume}
 };
 
 // Create new perfume
@@ -95,6 +97,12 @@ export const perfumeSlice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
+    // here the partial thing is used because I just wanna update the currperfume only
+    setCurrentPerfume: (state, action: PayloadAction<Partial<perfumeData>>) => {
+      state.currPerfume = { ...state.currPerfume, ...action.payload };
+    }
+    
+
   },
   extraReducers: (builder) => {
     builder
@@ -152,5 +160,5 @@ export const perfumeSlice = createSlice({
   },
 });
 
-export const { reset } = perfumeSlice.actions;
+export const { reset, setCurrentPerfume } = perfumeSlice.actions;
 export default perfumeSlice.reducer;

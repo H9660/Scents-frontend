@@ -11,13 +11,14 @@ import {
 
 const Contact = () => {
   return (
-    <Center minH="80vh" bg="black" color="white" p={4} fontFamily="Sirin Stencil">
+    <Center minH="80vh" color="white" p={4} fontFamily="Sirin Stencil">
       <Box
         width="min(90%, 1200px)"
         p={8}
         borderRadius="lg"
         border="2px solid gray"
         boxShadow="lg"
+        backgroundColor="black"
         // maxWidth="50vw"
         // width="min(90%, 1100px)"
       >
