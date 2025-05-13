@@ -4,16 +4,22 @@ import { Input, Button, VStack, Box, Text } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/Components/ui/spinner";
 import { clearError } from "../../slices/authSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { login, register } from "../../slices/authSlice";
 import { useRouter } from "next/navigation";
+import { RootState } from "@/slices/store";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+
 interface props {
   name: string;
   btn: string;
   page: string;
 }
+
 export const Form: React.FC<props> = ({ name, page, btn }) => {
   const router = useRouter();
+  const [fadeOut, setFadeOut] = useState(false);
+
   const [formData, setFormData] = useState({
     userPhone: "",
     userName: "",
@@ -25,10 +31,11 @@ export const Form: React.FC<props> = ({ name, page, btn }) => {
       [e.target.name]: e.target.value,
     }));
   };
+
   const { userName, userPhone } = formData;
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isLoading, otpWait, isError, message } = useSelector(
-    (state) => state.auth
+    (state: RootState) => state.auth
   );
 
   useEffect(() => {
@@ -43,16 +50,18 @@ export const Form: React.FC<props> = ({ name, page, btn }) => {
       toast.error("Please fill all the details.");
       return;
     }
-
     if (page === "Register" && userName === "") {
       toast.error("Please fill all the details.");
       return;
     }
-
     if (page == "Login") dispatch(login(formData));
     else dispatch(register(formData));
-
     if (isError) toast.error(message);
+  };
+
+  const handleClose = () => {
+    setFadeOut(true);
+    setTimeout(() => router.back(), 300); // Delay to match fade-out animation
   };
 
   if (isLoading) {
@@ -64,71 +73,128 @@ export const Form: React.FC<props> = ({ name, page, btn }) => {
   }
 
   return (
-    <Box
-      bg="gray.900"
-      color="white"
-      marginTop="2rem"
-      p={6}
-      rounded="md"
-      fontFamily="Sirin Stencil"
-      w={{ base: "90%", md: "500px" }}
-      mx="auto"
-      border="1px solid"
-      borderColor="gray.700"
-      fontSize="2rem"
-    >
-      <fieldset style={{ border: "none", padding: 0, margin: 0 }}>
-        <Text
-          textAlign="center"
-          style={{ fontWeight: "bold", marginBottom: "0.5rem" }}
-        >
-          {name}
-        </Text>
+    <>
+      <Box
+        position="fixed"
+        top="0"
+        left="0"
+        right="0"
+        bottom="0"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        zIndex="1000"
+        className={fadeOut ? "fade-out" : ""}
+      >
+        {/* Backdrop with blur */}
+        <Box
+          position="absolute"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.600"
+          backdropFilter="blur(8px)"
+          onClick={handleClose}
+        />
 
-        <VStack spaceY={4} align="stretch">
-          {page == "Register" && (
+        {/* Modal Content */}
+        <Box
+          bg="gray.900"
+          color="white"
+          p={6}
+          rounded="md"
+          fontFamily="Sirin Stencil"
+          w={{ base: "90%", md: "500px" }}
+          mx="auto"
+          border="1px solid"
+          borderColor="gray.700"
+          fontSize="2rem"
+          zIndex="1001"
+          position="relative"
+        >
+          {/* Close button */}
+          <Button
+            position="absolute"
+            top="10px"
+            right="10px"
+            size="sm"
+            onClick={handleClose}
+            bg="transparent"
+            _hover={{ bg: "whiteAlpha.200" }}
+          >
+            ✕
+          </Button>
+
+          <Text
+            textAlign="center"
+            style={{ fontWeight: "bold", marginBottom: "1.5rem" }}
+          >
+            {name}
+          </Text>
+
+          <VStack spaceY={4} align="stretch">
+            {page == "Register" && (
+              <Box>
+                <Text fontSize="sm" mb={1}>
+                  Name
+                </Text>
+                <Input
+                  bg="gray.800"
+                  borderColor="gray.600"
+                  onChange={onChange}
+                  name="userName"
+                  value={userName}
+                />
+              </Box>
+            )}
             <Box>
               <Text fontSize="sm" mb={1}>
-                Name
+                Phone Number
               </Text>
               <Input
                 bg="gray.800"
                 borderColor="gray.600"
                 onChange={onChange}
-                name="userName"
-                value={userName}
+                name="userPhone"
+                value={userPhone}
               />
             </Box>
-          )}
-          <Box>
-            <Text fontSize="sm" mb={1}>
-              Phone Number
-            </Text>
-            <Input
-              bg="gray.800"
-              borderColor="gray.600"
-              onChange={onChange}
-              name="userPhone"
-              value={userPhone}
-            />
-          </Box>
-          <Button
-            alignItems="center"
-            border="1px white solid"
-            colorScheme="whiteAlpha"
-            margin="auto"
-            padding="1.5rem"
-            width="30%"
-            _hover={{
-              color: "black",
-              bg: "pink",
-            }}
-            onClick={handleClick}
-          >
-            {btn}
-          </Button>
-        </VStack>
-      </fieldset>
-    </Box>
+            <Button
+              alignItems="center"
+              border="1px white solid"
+              colorScheme="whiteAlpha"
+              margin="auto"
+              padding="1.5rem"
+              width="30%"
+              _hover={{
+                color: "black",
+                bg: "pink",
+              }}
+              onClick={handleClick}
+            >
+              {btn}
+            </Button>
+          </VStack>
+        </Box>
+      </Box>
+
+      {/* Add CSS for fade-out effect */}
+      <style jsx>{`
+        .fade-out {
+          animation: fadeOut 0.3s forwards;
+        }
+
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+        }
+      `}</style>
+    </>
   );
 };

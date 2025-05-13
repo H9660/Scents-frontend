@@ -1,17 +1,28 @@
+"use client";
 import { useState, useEffect } from "react";
+import {
+  Box,
+  Input,
+  Button,
+  VStack,
+  Heading,
+} from "@chakra-ui/react";
 import { toast } from "react-toastify";
-import { reset, clearError } from "../slices/authSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { Input, Button, Box, VStack, Heading, Card } from "@chakra-ui/react";
-import { verifyotp } from "../slices/authSlice";
-import { useRouter } from "next/navigation";
-import { Spinner } from "@/Components/ui/spinner";
-export default function OTPLogin() {
-  const dispatch = useDispatch();
+import { clearError, clearOtpWait, verifyotp, reset } from "@/slices/authSlice";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { RootState } from "@/slices/store";
+import { useRouter } from "next/router";
+interface props {
+  name: string;
+}
+
+const Login: React.FC<props> = () => {
   const [otp, setOtp] = useState("");
+  const dispatch = useAppDispatch();
   const router = useRouter();
-  const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
+  const { otpWait, isError, isSuccess, message } = useSelector(
+    (state: RootState) => state.auth
   );
 
   useEffect(() => {
@@ -19,95 +30,100 @@ export default function OTPLogin() {
       toast.error(message);
       dispatch(clearError());
     }
-  }, [isError, message, dispatch]);
-
-  const handleSubmit = () => {
-    if (otp.length != 6) {
-      return;
+    if (!otpWait) {
+      router.push("/login");
     }
+  });
 
+  const handleOtpSubmit = () => {
+    if (otp.length !== 6) return;
     dispatch(verifyotp(otp));
-
-    if (isError) {
-      toast.error(message);
-    }
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  useEffect(() => {
+    if (isSuccess) {
+      const prevPath = sessionStorage.getItem("prevPath");
+      if (prevPath === "/login" || !prevPath) {
+        router.push("/home");  // Redirect to home if no valid previous path
+      } else {
+        router.push(prevPath); // Go back to the saved path
+      }
+      toast.success("Login successful!");
+      dispatch(reset());
+    }
+  }, [isSuccess, dispatch]);
 
-  if (isSuccess) {
-    router.push("/home");
-    toast.success("Login successful!");
-    dispatch(reset());
-  }
+  const handleClose = () => {
+    dispatch(clearOtpWait());
+    router.back();
+  };
+
+
 
   return (
-    <Box
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    height="60vh"
-    bgGradient="linear(to-br, #1a1a2e, #16213e)"
-    color="white"
-    fontFamily="Sirin Stencil"
-  >
-    <Card.Root
-      width="100%"
-      maxWidth={{base:"400px", md:"500px"}}
-      bg="rgba(255, 255, 255, 0.1)"
-      backdropFilter="blur(15px)"
-      border="1px solid rgba(255, 255, 255, 0.2)"
-      borderRadius="2xl"
-      boxShadow="xl"
-      p={6}
-      textAlign="center"
-    >
-      <Card.Body gap="4">
-        <VStack spacing={6}>
-          <Heading size="lg" color="gold">
-            🔒 Secure Login
-          </Heading>
-          <Heading size="md" textAlign="center">
-            Enter OTP
-          </Heading>
-          <Input
-            type="text"
-            maxLength={6}
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="6-digit OTP"
-            textAlign="center"
-            margin="2rem auto"
-            fontSize="2xl"
-            letterSpacing="widest"
-            borderColor="gold"
-            boderColor="white"
-            _placeholder={{ color: "gray.400" }}
-            _focus={{ borderColor: "gold" }}
-          />
-          <Button
-            bg="gold"
-            color="black"
-            fontWeight="bold"
-            width="full"
-            padding="12px"
-            borderRadius="lg"
-            borderColor="white"
-            _hover={{
-              bg: "white",
-              color: "black",
-              transform: "scale(1.05)",
-              transition: "all 0.2s ease-in-out",
-            }}
-            onClick={handleSubmit}
+    <>
+      {otpWait && (
+        <Box
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.400"
+          backdropFilter="blur(15px)"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          zIndex="1000"
+        >
+          <Box
+            bg="gray.900"
+            color="white"
+            p={6}
+            rounded="lg"
+            w={{ base: "90%", md: "500px" }}
+            position="relative"
           >
-            Verify OTP
-          </Button>
-        </VStack>
-      </Card.Body>
-    </Card.Root>
-  </Box>
+            <Button
+              position="absolute"
+              top="10px"
+              right="10px"
+              size="sm"
+              onClick={handleClose}
+              bg="transparent"
+              _hover={{ bg: "whiteAlpha.200" }}
+            >
+              ✕
+            </Button>
+
+            <VStack spaceY={4} align="stretch">
+              <Heading size="md" textAlign="center">
+                Enter OTP
+              </Heading>
+              <Input
+                type="text"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="6-digit OTP"
+                textAlign="center"
+                fontSize="2xl"
+                letterSpacing="widest"
+                borderColor="gold"
+              />
+              <Button
+                bg="gold"
+                color="black"
+                onClick={handleOtpSubmit}
+              >
+                Verify OTP
+              </Button>
+            </VStack>
+          </Box>
+        </Box>
+      )}
+    </>
   );
-}
+};
+
+export default Login;

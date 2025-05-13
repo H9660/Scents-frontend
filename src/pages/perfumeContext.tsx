@@ -1,41 +1,51 @@
 "use-client";
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import {toast} from 'react-toastify'
-import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { Center, Grid, Image, Card, Button, Text, Box } from "@chakra-ui/react";
-import { useSearchParams } from "next/navigation";
-import { addToCart } from "../slices/authSlice";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { addToCart } from "../slices/authSlice.ts";
+import { User } from "@/slices/types.ts";
+import ShoppingCart from "./shoppingcart.tsx";
+import { RootState } from "@/slices/store.ts";
 export default function PerfumeContext() {
   const router = useRouter();
-  const dispatch = useDispatch();
-  const params = useSearchParams();
-  const name = params?.get("name");
-  const url = params?.get("url");
-  const price = params?.get("price");
-  const [user, setUser] = useState("");
+  // const params = useSearchParams();
+  // const name = params?.get("name");
+  // const url = params?.get("url");
+  // const price = params?.get("price");
+  const [user, setUser] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const {currPerfume} = useSelector((state: RootState)=>state.perfumes)
   useEffect(() => {
     let user = localStorage.getItem("savedUser");
     if (user) user = JSON.parse(user);
     setUser(user);
   }, []);
-  const selectPerfumeAndCheckout = () => {
-    const data = {
-      userId: user.id,
-      cart: {
-        [name]: 1,
-      },
-    };
-    dispatch(addToCart(data));
-    toast.success("Added to cart successfully");
+
+  const addtoCart = async () => {
+    if (!user) router.push("/login");
+    else {
+      const data = {
+        userId: (user as unknown as User).id,
+        cart: {
+          [currPerfume.name as string]: 1,
+        },
+      };
+
+      await dispatch(addToCart(data));
+      toast.success("Added to cart successfully. Please click on cart.");
+    }
   };
 
-  const HandleCheckout = () => {
-    const user = localStorage.getItem("savedUser");
-    if (!user) router.push("/login");
-  };
+  const gotoCart= async () => {
+      await addtoCart()
+      return <ShoppingCart/>
+    }
+
   return (
-    <Center bg="black" color="white" p={4} fontFamily="Sirin Stencil">
+    <Center color="white" p={4} fontFamily="Sirin Stencil">
       <Box
         width="auto"
         border="1px solid white"
@@ -50,7 +60,7 @@ export default function PerfumeContext() {
               position="relative"
               alignItems="center"
               rounded="md"
-              src={url}
+              src={currPerfume.imageUrl}
               alt="Dan Abramov"
               maxH="300px"
             />
@@ -58,16 +68,16 @@ export default function PerfumeContext() {
           <Card.Root width="320px">
             <Card.Body textAlign="center" gap="2" spaceY="2rem">
               <Card.Title fontSize="3rem" textWrap="wrap" lineHeight="shorter">
-                {name}
+                {currPerfume.name}
               </Card.Title>
               <Card.Description fontSize={{ base: "2rem" }}>
-                Queen Energy Eau De Parfum Intense
+              {currPerfume.discription}
               </Card.Description>
             </Card.Body>
 
             <Card.Footer justifyContent="flex-end">
               <Text fontSize="xl" fontWeight="bold" mr="10px">
-                ₹ {price}
+                ₹ {currPerfume.price}
               </Text>
               <Button
                 variant="outline"
@@ -80,7 +90,7 @@ export default function PerfumeContext() {
                   bg: "white",
                   color: "black",
                 }}
-                onClick={selectPerfumeAndCheckout}
+                onClick={addtoCart}
               >
                 Add to cart
               </Button>
@@ -96,7 +106,7 @@ export default function PerfumeContext() {
                   bg: "pink",
                   color: "black",
                 }}
-                onClick={HandleCheckout}
+                onClick={gotoCart}
               >
                 Buy now
               </Button>

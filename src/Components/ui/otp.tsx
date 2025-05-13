@@ -1,17 +1,19 @@
 import { useState} from "react";
 import { toast } from "react-toastify";
 import { reset } from "../../slices/authSlice";
-import { useDispatch, useSelector } from "react-redux";
+import {useSelector } from "react-redux";
 import { Input, Button, Box, VStack, Heading, Card } from "@chakra-ui/react";
 import { verifyotp } from "../../slices/authSlice";
 import { useRouter } from "next/navigation";
 import { Spinner } from "./spinner";
+import { RootState } from "@/slices/store";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 export default function OTPLogin() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [otp, setOtp] = useState("");
   const router = useRouter();
   const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.auth
+    (state: RootState) => state.auth
   );
 
   const handleSubmit = () => {

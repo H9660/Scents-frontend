@@ -1,28 +1,29 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import perfumeService from "../services/perfumeService";
-
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import perfumeService from "../services/perfumeService.ts";
+import { perfumeData, perfumeUpdateDataFormat} from "./types";
 const defaultperfume = {
   name: "",
   price: 500,
   quantity: "SMALL",
-  imageUrl: ""
+  imageUrl: "",
+  discription: ""
 };
 
 const initialState = {
   perfume: { ...defaultperfume },
-  perfumes: [],
+  perfumes: [] as perfumeData[],
   isError: false,
   isSuccess: false,
   perfumeLoading: false,
   message: "",
+  currPerfume: {...defaultperfume}
 };
 
 // Create new perfume
 export const createperfume = createAsyncThunk(
   "perfume/create",
-  async (perfumeData, thunkAPI) => {
+  async (perfumeData: perfumeData, thunkAPI) => {
     try {
-        //   const token = thunkAPI.getState().auth.user.token
       return await perfumeService.createperfume(perfumeData);
     } catch (error) {
       const message =
@@ -38,7 +39,7 @@ export const createperfume = createAsyncThunk(
 
 export const getperfume = createAsyncThunk(
   "perfume/get",
-  async (name, thunkAPI) => {
+  async (name: string, thunkAPI) => {
     try {
       // const token = thunkAPI.getState().auth.user.token
       return await perfumeService.getperfume(name);
@@ -75,48 +76,10 @@ export const getperfumes = createAsyncThunk(
 // Update perfume
 export const updateperfume = createAsyncThunk(
   "perfume/update",
-  async (perfumeData, thunkAPI) => {
+  async (perfumeData: perfumeUpdateDataFormat, thunkAPI) => {
     try {
       // const token = thunkAPI.getState().auth.user.token
       return await perfumeService.updateperfume(perfumeData);
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
-// Delete user perfume
-export const deleteperfume = createAsyncThunk(
-  "perfume/delete",
-  async (title, thunkAPI) => {
-    try {
-      // const token = thunkAPI.getState().auth.user.token
-      return await perfumeService.deleteperfume(title);
-    } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
-export const calcBatchPrice = createAsyncThunk(
-  "perfume/calcBatchPrice",
-  async (data, thunkAPI) => {
-    try {
-      console.log("slice data is", data)
-      // const token = thunkAPI.getState().auth.user.token
-      return await perfumeService.calcbatchPrice(data);
     } catch (error) {
       const message =
         (error.response &&
@@ -134,6 +97,12 @@ export const perfumeSlice = createSlice({
   initialState,
   reducers: {
     reset: () => initialState,
+    // here the partial thing is used because I just wanna update the currperfume only
+    setCurrentPerfume: (state, action: PayloadAction<Partial<perfumeData>>) => {
+      state.currPerfume = { ...state.currPerfume, ...action.payload };
+    }
+    
+
   },
   extraReducers: (builder) => {
     builder
@@ -148,7 +117,7 @@ export const perfumeSlice = createSlice({
       .addCase(createperfume.rejected, (state, action) => {
         state.perfumeLoading = false;
         state.isError = true;
-        state.message = action.payload;
+        state.message = JSON.stringify(action.payload);
       })
       .addCase(getperfumes.pending, (state) => {
         state.perfumeLoading = true;
@@ -161,7 +130,7 @@ export const perfumeSlice = createSlice({
       .addCase(getperfumes.rejected, (state, action) => {
         state.perfumeLoading = false;
         state.isError = true;
-        state.message = action.payload;
+        state.message = JSON.stringify(action.payload);
       })
       .addCase(getperfume.pending, (state) => {
         state.perfumeLoading = true;
@@ -174,49 +143,22 @@ export const perfumeSlice = createSlice({
       .addCase(getperfume.rejected, (state, action) => {
         state.perfumeLoading = false;
         state.isError = true;
-        state.message = action.payload;
-      })
-      .addCase(deleteperfume.pending, (state) => {
-        state.perfumeLoading = true;
-      })
-      .addCase(deleteperfume.fulfilled, (state, action) => {
-        state.perfumeLoading = false;
-        state.isSuccess = true;
-        state.perfumes = state.perfumes.filter(
-          (perfume) => perfume.title !== action.payload.title
-        );
-      })
-      .addCase(deleteperfume.rejected, (state, action) => {
-        state.perfumeLoading = false;
-        state.isError = true;
-        state.message = action.payload;
+        state.message = JSON.stringify(action.payload);
       })
       .addCase(updateperfume.pending, (state) => {
         state.perfumeLoading = true;
       })
-      .addCase(updateperfume.fulfilled, (state, action) => {
+      .addCase(updateperfume.fulfilled, (state) => {
         state.perfumeLoading = false;
         state.isSuccess = true;
-        state.perfumes = state.perfumes.filter(
-          (perfume) => perfume.title !== action.payload.title
-        );
       })
       .addCase(updateperfume.rejected, (state, action) => {
         state.perfumeLoading = false;
         state.isError = true;
-        state.message = action.payload;
-      })
-      .addCase(calcBatchPrice.pending, (state) => {
-        state.perfumeLoading = true;
-      })
-      .addCase(calcBatchPrice.fulfilled, (state) => {
-        state.perfumeLoading = false;
-      })
-      .addCase(calcBatchPrice.rejected, (state) => {
-        state.perfumeLoading = false;
+        state.message = JSON.stringify(action.payload);
       })
   },
 });
 
-export const { reset } = perfumeSlice.actions;
+export const { reset, setCurrentPerfume } = perfumeSlice.actions;
 export default perfumeSlice.reducer;
