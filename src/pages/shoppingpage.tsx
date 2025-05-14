@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { Button, Image, Grid, Box, Text} from "@chakra-ui/react";
+import { Button, Image, Grid, Box, Text } from "@chakra-ui/react";
 import { Spinner } from "@/Components/ui/spinner.tsx";
 import { addToCart } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
@@ -13,11 +13,13 @@ import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [user, setUser] = useState<User>(defaultUser)
-  const { isLoading } = useSelector((state: RootState) => state.auth);
+  const [user, setUser] = useState<User>(defaultUser);
+  const { isLoading, cartUpdated, message } = useSelector(
+    (state: RootState) => state.auth
+  );
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(user);  
+    setUser(user);
   }, []);
 
   if (isLoading) {
@@ -30,9 +32,9 @@ export default function Shoppingpage({ perfumesData = [] }) {
           fontFamily="Great Vibes"
           textAlign="center"
           color="white"
-          fontSize={{md: "8xl", base: "6xl"}}
-          marginTop={{base: "5%", md: "4%", lg: "3%"}}
-          marginBottom={{base: "5%", md: "4%", lg: "3%"}}
+          fontSize={{ md: "8xl", base: "6xl" }}
+          marginTop={{ base: "5%", md: "4%", lg: "3%" }}
+          marginBottom={{ base: "5%", md: "4%", lg: "3%" }}
         >
           Our latest arrivals
         </Box>
@@ -106,7 +108,10 @@ export default function Shoppingpage({ perfumesData = [] }) {
                           cart: { [link.name]: 1 },
                         })
                       );
-                      toast.success("Added to cart successfully");
+
+                      if (cartUpdated)
+                        toast.success("Added to cart successfully");
+                      else toast.error(message);
                     }}
                   >
                     Add to cart
@@ -122,14 +127,14 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     borderRadius="4px"
                     width="33%"
                     _hover={{ bg: "pink", color: "black" }}
-                    onClick={() =>
-                      {dispatch(setCurrentPerfume(link))
+                    onClick={() => {
+                      dispatch(setCurrentPerfume(link));
                       router.push(
                         `/perfumeContext?name=${link.name}&url=${
                           link.imageUrl
                         }&price=${link.price || 1000}`
-                      )}
-                    }
+                      );
+                    }}
                   >
                     Buy now
                   </Button>

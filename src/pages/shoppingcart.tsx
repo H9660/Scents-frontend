@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
 import { User } from "@/slices/types.ts";
-import { RazorpayOptions, RazorpayInstance, data } from "@/slices/types.ts";
+import { RazorpayOptions, RazorpayInstance, data, defaultUser  } from "@/slices/types.ts";
 import Image from "next/image";
 import { createTransaction } from 
 "@/utils/paymentUtil";
@@ -18,7 +18,7 @@ declare global {
 }
 
 export default function CheckoutPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const [total, setTotal] = useState(0);
   const [formData, setFormData] = useState({
     email: "",

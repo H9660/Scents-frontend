@@ -17,7 +17,7 @@ const initialState = {
   otpWait: false,
   cartUpdated: false,
   userCart: [],
-  message: ""
+  message: "" as string  
 };
 
 
@@ -201,8 +201,9 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.cartUpdated = true;
       })
-      .addCase(addToCart.rejected, (state) => {
+      .addCase(addToCart.rejected, (state, action: any) => {
         state.isLoading = false;
+        state.message = action.payload;
       })  
       .addCase(getUserCart.pending, (state) => {
         state.isLoading = true;
