@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { defaultUser, User } from "@/slices/types.ts";
 import {
   Box,
@@ -26,6 +26,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/Components/ui/drawer";
+import { useSelector } from "react-redux";
+import { RootState } from "@/slices/store";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
@@ -34,9 +36,8 @@ const Navbar = () => {
     { label: "Cart", url: "/shoppingcart" },
   ];
   const [isVisible, setIsVisible] = useState(false);
-
+  const { isLoggedin } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    // Trigger the fade-in effect after the component mounts
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -44,9 +45,9 @@ const Navbar = () => {
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(currUser);
-  }, []);
+  }, [isLoggedin]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setSmall(window.innerWidth < 800);
     };
@@ -111,7 +112,7 @@ const Navbar = () => {
                   else navigate("/login");
                 }}
               >
-                {user.name ? user.name.split(" ")[0] : "Login"}
+                {user?.name ? user?.name.split(" ")[0] : "Login"}
               </Button>
             </Box>
           )}

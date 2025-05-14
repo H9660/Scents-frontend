@@ -27,8 +27,8 @@ export type User = {
   id: string;
   name: string;
   phone: string;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
+  createdAt: string; 
+  updatedAt: string; 
   address: string;
   totalCartprice: number;
 };

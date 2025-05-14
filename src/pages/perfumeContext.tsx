@@ -11,10 +11,6 @@ import ShoppingCart from "./shoppingcart.tsx";
 import { RootState } from "@/slices/store.ts";
 export default function PerfumeContext() {
   const router = useRouter();
-  // const params = useSearchParams();
-  // const name = params?.get("name");
-  // const url = params?.get("url");
-  // const price = params?.get("price");
   const [user, setUser] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const {currPerfume} = useSelector((state: RootState)=>state.perfumes)

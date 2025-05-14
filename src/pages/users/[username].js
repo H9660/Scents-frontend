@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import useSWR from "swr";
-import profile from "../../images/profile.png";
 import { Spinner } from "@/Components/ui/spinner";
-
+import { defaultUser} from "@/slices/types";
+import { logout } from "@/slices/authSlice";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
 const getUser = async (id) => {
   const response = await fetch(`/api/users/getOrders?userId=${id}`);
   const data = await response.json();
@@ -11,22 +12,32 @@ const getUser = async (id) => {
 
 export default function UserAccount() {
   const [activeTab, setActiveTab] = useState("details");
-  const [curruser, setcurrUser] = useState({});
-
+  const [curruser, setcurrUser] = useState(defaultUser);
+  const [address, setAddress] = useState({});
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const dispatch = useAppDispatch()
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("savedUser") || "{}");
-    setcurrUser(user);
+    const userStr = localStorage.getItem("savedUser");
+    const addressStr = localStorage.getItem("address");
+
+    if (userStr) setcurrUser(JSON.parse(userStr));
+    if (addressStr) setAddress(JSON.parse(addressStr));
+    setIsLoadingUser(false);
   }, []);
 
-  const { data, error, isLoading } = useSWR("TEST", () => getUser(curruser.id));
+  const { data, error, isLoading } = useSWR(
+    curruser.id ? "orders" : null,
+    () => getUser(curruser.id)
+  );
+
   if (error) return <div className="text-white">Failed to load user data.</div>;
-  if (isLoading) return <Spinner />;
+  if (isLoadingUser || isLoading) return <Spinner />;
 
   return (
     <div className="bg-gray-900 text-white flex justify-center items-center min-h-screen p-6">
-      <div className="bg-gray-800 p-6 rounded-2xl w-[700px] shadow-lg flex">
+      <div className="bg-gray-800 p-6 rounded-2xl w-[700px] shadow-lg flex flex-col sm:flex-row">
         {/* Sidebar */}
-        <div className="w-1/3 border-r border-gray-600 pr-4">
+        <div className="sm:w-1/3 border-b sm:border-b-0 sm:border-r border-gray-600 pr-4 mb-4 sm:mb-0">
           <button
             className={`w-full text-left py-2 px-4 rounded-lg ${
               activeTab === "details" ? "bg-blue-600" : "hover:bg-gray-700"
@@ -43,18 +54,22 @@ export default function UserAccount() {
           >
             Orders
           </button>
+          <button
+            className="w-full text-left py-2 px-4 mt-4 rounded-lg bg-red-600 hover:bg-red-700"
+            onClick={() => {
+              dispatch(logout())
+              window.location.href = "/";
+            }}
+          >
+            Logout
+          </button>
         </div>
 
-        {/* Right Content */}
-        <div className="w-2/3 pl-4">
+        {/* Content */}
+        <div className="sm:w-2/3 pl-0 sm:pl-4">
           {activeTab === "details" && (
             <div>
               <div className="flex items-center space-x-4">
-                <img
-                  src={profile || curruser.photo}
-                  alt="User"
-                  className="w-16 h-16 rounded-full border-2 border-gray-500"
-                />
                 <div>
                   <h2 className="text-xl font-semibold">{curruser.name}</h2>
                   <p className="text-gray-400 text-sm">{curruser.email}</p>
@@ -62,11 +77,14 @@ export default function UserAccount() {
                 </div>
               </div>
               <p className="mt-4">
-                <strong>Address:</strong> {curruser.address}
+                <strong>Address:</strong>{" "}
+                {!address || (
+                  <span className="text-yellow-400">Please add your address 🚩</span>
+                )}
               </p>
               <button
                 className="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg w-full"
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => alert("Open update profile modal")}
               >
                 Update Profile
               </button>
@@ -79,22 +97,26 @@ export default function UserAccount() {
               {data.orders.length === 0 ? (
                 <p className="text-gray-400">No orders yet.</p>
               ) : (
-                <table className="w-full border-collapse border border-gray-700 rounded-lg">
-                  <thead>
-                    <tr className="bg-gray-700 text-white">
-                      <th className="border border-gray-600 p-2">Transaction ID</th>
-                      <th className="border border-gray-600 p-2">Subtotal</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.orders.map((order) => (
-                      <tr key={order.transactions_id} className="text-center bg-gray-800">
-                        <td className="border border-gray-600 p-2">{order.transactions_id}</td>
-                        <td className="border border-gray-600 p-2">${order.subtotal}</td>
+                <div className="max-h-64 overflow-y-auto rounded-lg">
+                  <table className="w-full border-collapse border border-gray-700 rounded-lg">
+                    <thead>
+                      <tr className="bg-gray-700 text-white">
+                        <th className="border border-gray-600 p-2">Transaction ID</th>
+                        <th className="border border-gray-600 p-2">Subtotal</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {data.orders.map((order) => (
+                        <tr key={order.transactions_id} className="text-center bg-gray-800">
+                          <td className="border border-gray-600 p-2">
+                            {order.transactions_id}
+                          </td>
+                          <td className="border border-gray-600 p-2">${order.subtotal}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}

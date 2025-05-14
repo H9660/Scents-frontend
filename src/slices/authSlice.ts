@@ -10,6 +10,7 @@ const user = savedUser ? JSON.parse(savedUser) : null;
 
 const initialState = {
   user: user ? user : null,
+  isLoggedin: false,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -41,9 +42,7 @@ export const login = createAsyncThunk(
 );
 
 export const register = createAsyncThunk(
-  // name of an action
   "auth/register",
-  // logic of the action creator
   async (user: userDataFormat, thunkAPI) => {
     try {
       return await authService.register(user);
@@ -64,9 +63,7 @@ export const logout = createAsyncThunk("auth/logout", async () => {
 });
 
 export const verifyotp = createAsyncThunk(
-  // name of an action
   "auth/verifyotp",
-  // logic of the action creator
   async (otp: string, thunkAPI) => {
     try {
       return await authService.verifyOTP(otp);
@@ -84,9 +81,7 @@ export const verifyotp = createAsyncThunk(
 );
 
 export const addToCart = createAsyncThunk(
-  // name of an action
   "auth/addtocart",
-  // logic of the action creatorat
   async (cart: cartData, thunkAPI) => {
     try {
       return await authService.addtoCart(cart);
@@ -104,9 +99,7 @@ export const addToCart = createAsyncThunk(
 );
 
 export const getUserCart = createAsyncThunk(
-  // name of an action
   "auth/getusercart",
-  // logic of the action creatorat
   async (userId: string, thunkAPI) => {
     try {
       return await authService.getuserCart(userId);
@@ -127,8 +120,6 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // This reset is an action creator that the reducer is performing on the state
-    // We are not resetting the user as we need to persist the userf
     reset: (state) => {
       state.isLoading = false;
       state.isSuccess = false;
@@ -138,7 +129,7 @@ export const authSlice = createSlice({
     },
     clearError: (state) => {
       state.isError = false;
-      state.message = ""; // Clear only error-related state
+      state.message = ""; 
     },
     resetCartUpdated: (state)=>{
       state.cartUpdated = false
@@ -148,8 +139,6 @@ export const authSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    // This is to handle the async nature of the asyncThunk function.
-    // The objects pending, fulfilled and rejected are indeed action objects
     builder
       .addCase(register.pending, (state) => {
         state.isLoading = true;
@@ -183,6 +172,7 @@ export const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
+        state.isLoggedin=false;
       })
       .addCase(verifyotp.pending, (state) => {
         state.isSuccess = false;
@@ -192,6 +182,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.isError = false;
+        state.isLoggedin= true;
         state.otpWait = false;
         state.user = action.payload.user;
       })
@@ -221,11 +212,9 @@ export const authSlice = createSlice({
       })
       .addCase(getUserCart.rejected, (state) => {
         state.isLoading = false;
-      });
-      
+      })    
   },
 });
 
-// Exporting the reducer
 export const { reset, clearError, resetCartUpdated, clearOtpWait } = authSlice.actions;
 export default authSlice.reducer;

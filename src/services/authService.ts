@@ -56,7 +56,7 @@ const verifyOTP = async (otp: string) => {
 };
 
 const logout = async () => {
-  localStorage.removeItem("user");
+  localStorage.removeItem("savedUser");
   console.log("User Removed");
 };
 

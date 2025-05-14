@@ -1,12 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  Box,
-  Input,
-  Button,
-  VStack,
-  Heading,
-} from "@chakra-ui/react";
+import { Box, Input, Button, VStack, Heading } from "@chakra-ui/react";
 import { toast } from "react-toastify";
 import { clearError, clearOtpWait, verifyotp, reset } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
@@ -44,9 +38,9 @@ const Login: React.FC<props> = () => {
     if (isSuccess) {
       const prevPath = sessionStorage.getItem("prevPath");
       if (prevPath === "/login" || !prevPath) {
-        router.push("/home");  // Redirect to home if no valid previous path
+        router.push("/home");
       } else {
-        router.push(prevPath); // Go back to the saved path
+        router.push(prevPath);
       }
       toast.success("Login successful!");
       dispatch(reset());
@@ -57,8 +51,6 @@ const Login: React.FC<props> = () => {
     dispatch(clearOtpWait());
     router.back();
   };
-
-
 
   return (
     <>
@@ -111,11 +103,7 @@ const Login: React.FC<props> = () => {
                 letterSpacing="widest"
                 borderColor="gold"
               />
-              <Button
-                bg="gold"
-                color="black"
-                onClick={handleOtpSubmit}
-              >
+              <Button bg="gold" color="black" onClick={handleOtpSubmit}>
                 Verify OTP
               </Button>
             </VStack>
