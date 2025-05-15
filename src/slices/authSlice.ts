@@ -201,9 +201,9 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.cartUpdated = true;
       })
-      .addCase(addToCart.rejected, (state, action: any) => {
+      .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;
-        state.message = action.payload;
+        state.message = action.payload as string; 
       })  
       .addCase(getUserCart.pending, (state) => {
         state.isLoading = true;
