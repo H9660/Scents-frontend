@@ -100,20 +100,29 @@ const Navbar = () => {
               fontSize="30px"
             >
               {navUrls.map((link) => (
-                <Button key={link.url} onClick={() => navigate(link.url)}>
-                  {link.label}
-                </Button>
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.url)}
+                  className="relative group"
+                >
+                  <span className="relative">{link.label}</span>
+                  <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                </button>
               ))}
 
-              <Button
+              <button
                 key={user?.name}
                 onClick={() => {
                   if (user?.name) navigate(`/users/${user?.name}`);
                   else navigate("/login");
                 }}
+                className="relative group"
               >
-                {user?.name ? user?.name.split(" ")[0] : "Login"}
-              </Button>
+                <span className="relative">
+                  {user?.name ? user?.name.split(" ")[0] : "Login"}
+                </span>
+                <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+              </button>
             </Box>
           )}
 

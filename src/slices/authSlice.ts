@@ -157,6 +157,7 @@ export const authSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state) => {
         state.isLoading = false;
+        state.message = "";
         state.cartUpdated = true;
       })
       .addCase(addToCart.rejected, (state, action) => {

@@ -4,7 +4,7 @@ export async function getStaticProps() {
   const perfumesData = await res.json();
   return {
     props: { perfumesData },
-    revalidate: 60, // ISR: Updates data every 60 s ec
+    revalidate: 60,
   };
 }
 export default function Home({ perfumesData = [] }) {

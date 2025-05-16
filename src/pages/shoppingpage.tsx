@@ -3,10 +3,10 @@ import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { Button, Image, Grid, Box, Text } from "@chakra-ui/react";
-import { Spinner } from "@/Components/ui/spinner.tsx";
-import { addToCart } from "../slices/authSlice.ts";
+import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { Loader2 } from "lucide-react";
 import { defaultUser, perfumeData } from "@/slices/types.ts";
 import { User } from "@/slices/types.ts";
 import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
@@ -17,14 +17,22 @@ export default function Shoppingpage({ perfumesData = [] }) {
   const { isLoading, cartUpdated, message } = useSelector(
     (state: RootState) => state.auth
   );
+  const [currButtontoCart, setCurrButtontoCart] = useState("");
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(user);
   }, []);
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  useEffect(() => {
+    if (cartUpdated) {
+      toast.success("Added to cart successfully");
+      dispatch(resetCartUpdated());
+    }
+
+    if(message!=="")
+    toast.error(message)
+  }, [cartUpdated, message]);
+
   return (
     <>
       <div className="mainDiv">
@@ -101,20 +109,24 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     fontSize="1rem"
                     _hover={{ bg: "white", color: "black" }}
                     onClick={async () => {
-                      if (!user) return router.push("/login");
+                      setCurrButtontoCart(link.name);
+                      if (!user) {
+                        router.push("/login");
+                        return;
+                      }
                       await dispatch(
                         addToCart({
                           userId: (user as User).id,
                           cart: { [link.name]: 1 },
                         })
                       );
-
-                      if (cartUpdated)
-                        toast.success("Added to cart successfully");
-                      else toast.error(message);
                     }}
                   >
-                    Add to cart
+                    {isLoading && currButtontoCart === link.name ? (
+                      <Loader2 className="animate-spin text-white-400" />
+                    ) : (
+                      "Add to cart"
+                    )}
                   </Button>
 
                   <Button
@@ -136,7 +148,7 @@ export default function Shoppingpage({ perfumesData = [] }) {
                       );
                     }}
                   >
-                    Buy now
+                    Buy Now
                   </Button>
                 </Box>
               </Box>
