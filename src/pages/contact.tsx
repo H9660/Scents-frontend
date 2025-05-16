@@ -19,8 +19,6 @@ const Contact = () => {
         border="2px solid gray"
         boxShadow="lg"
         backgroundColor="black"
-        // maxWidth="50vw"
-        // width="min(90%, 1100px)"
       >
         <Heading fontSize="4xl" textAlign="center" mb={4} fontFamily="Sirin Stencil">
           Contact Details

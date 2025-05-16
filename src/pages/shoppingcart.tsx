@@ -1,15 +1,20 @@
 "use client";
 import useSWR from "swr";
-import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { FiAlertCircle } from 'react-icons/fi';
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { FiAlertCircle } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
 import { User } from "@/slices/types.ts";
-import { RazorpayOptions, RazorpayInstance, data } from "@/slices/types.ts";
+import axios from "axios";
+import {
+  RazorpayOptions,
+  RazorpayInstance,
+  defaultUser,
+  cartItemFormat,
+} from "@/slices/types.ts";
 import Image from "next/image";
-import { createTransaction } from 
-"@/utils/paymentUtil";
+import { createTransaction } from "@/utils/paymentUtil";
 
 declare global {
   interface Window {
@@ -18,7 +23,7 @@ declare global {
 }
 
 export default function CheckoutPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const [total, setTotal] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
@@ -37,26 +42,29 @@ export default function CheckoutPage() {
       const savedUser = JSON.parse(localStorage.getItem("savedUser") || "null");
       if (!savedUser) throw new Error("User not found");
 
-      const userCart = await fetch(
-        `${process.env.NEXT_PUBLIC_API_KEY}api/users/getCart?userId=${savedUser.id}`
+      const userCart = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_KEY}api/users/getCart?userId=${savedUser.id}`,
+        {
+          withCredentials: true,
+        }
       );
-      const parsedCart = await userCart.json();
-      setTotal(parsedCart.price);
-      return parsedCart;
+      console.log(userCart);
+      setTotal(userCart.data.price);
+      return userCart.data;
     } catch (error) {
       console.error("Error fetching cart:", error);
       return null;
     }
   };
 
-  const { data, isLoading } = useSWR("render", getCart, {
+  const { data, isLoading } = useSWR("cart", getCart, {
     revalidateOnFocus: false,
   });
-
+  console.log(data);
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     const formData = JSON.parse(localStorage.getItem("address") || "null");
-    setFormData(formData);
+    if (formData) setFormData(formData);
     if (!savedUser?.id) {
       router.push("/login");
       return;
@@ -101,7 +109,6 @@ export default function CheckoutPage() {
     });
 
     const { order } = await res.json();
-
     const options: RazorpayOptions = {
       key_id: process.env.RAZORPAY_KEY_ID!,
       amount: order.amount,
@@ -183,188 +190,186 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center p-2 sm:p-4 md:p-6 font-roboto">
-  <div className="w-full max-w-6xl bg-black shadow-lg rounded-lg flex flex-col md:flex-row overflow-hidden md:h-[40rem] lg:h-[50rem]">
-    
-    {/* Left Section: Form (Fixed) */}
-    <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-8 bg-gray-800 text-white flex flex-col md:h-full">
-      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8">
-        Shipping Details
-      </h2>
-      <div className="space-y-3 sm:space-y-4 md:space-y-6">
-        <div>
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData ? formData.name : ""}
-            onChange={handleInputChange}
-            className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-          />
-          {errors.name && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">
-              {errors.name}
-            </p>
+      <div className="w-full max-w-6xl bg-black shadow-lg rounded-lg flex flex-col md:flex-row overflow-hidden md:h-[40rem] lg:h-[50rem]">
+        {/* Left Section: Form (Fixed) */}
+        <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-8 bg-gray-800 text-white flex flex-col md:h-full">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8">
+            Shipping Details
+          </h2>
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
+            <div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData ? formData.name : ""}
+                onChange={handleInputChange}
+                className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+              />
+              {errors.name && (
+                <p className="text-red-400 text-xs sm:text-sm mt-1">
+                  {errors.name}
+                </p>
+              )}
+            </div>
+            <div>
+              <input
+                type="text"
+                name="email"
+                placeholder="Email"
+                value={formData ? formData.email : ""}
+                onChange={handleInputChange}
+                className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+              />
+              {errors.email && (
+                <p className="text-red-400 text-xs sm:text-sm mt-1">
+                  {errors.email}
+                </p>
+              )}
+            </div>
+            <div>
+              <textarea
+                name="address"
+                placeholder="Street Address"
+                value={formData ? formData.address : ""}
+                onChange={handleInputChange}
+                className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+                rows={3}
+              />
+              {errors.address && (
+                <p className="text-red-400 text-xs sm:text-sm mt-1">
+                  {errors.address}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+              <div>
+                <input
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                  value={formData ? formData.city : ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+                />
+                {errors.city && (
+                  <p className="text-red-400 text-xs sm:text-sm mt-1">
+                    {errors.city}
+                  </p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                  value={formData ? formData.state : ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+                />
+                {errors.state && (
+                  <p className="text-red-400 text-xs sm:text-sm mt-1">
+                    {errors.state}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+              <div>
+                <input
+                  type="text"
+                  name="zipCode"
+                  placeholder="ZIP Code"
+                  value={formData ? formData.zipCode : ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+                />
+                {errors.zipCode && (
+                  <p className="text-red-400 text-xs sm:text-sm mt-1">
+                    {errors.zipCode}
+                  </p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name="country"
+                  placeholder="Country"
+                  value={formData ? formData.country : ""}
+                  onChange={handleInputChange}
+                  className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
+                />
+                {errors.country && (
+                  <p className="text-red-400 text-xs sm:text-sm mt-1">
+                    {errors.country}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section: Cart (Scrollable Items) */}
+        <div className="w-full md:w-1/2 bg-gray-900 p-4 sm:p-6 md:p-8 text-white flex flex-col sm:h-[60vh] md:h-full">
+          {data && data.cart && Object.entries(data.cart).length > 0 ? (
+            <div>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8">
+                Your Cart
+              </h2>
+
+              {/* Scrollable Cart Items */}
+              <ScrollArea className="flex-1 overflow-y-scroll h-[500px]">
+                <ul className="divide-y divide-gray-700">
+                  {Object.entries(data.cart).map(([ele, idx]) => (
+                    <li
+                      key={ele}
+                      className="flex py-3 sm:py-4 md:py-6 items-center"
+                    >
+                      <Image
+                        src={(idx as cartItemFormat).imageUrl}
+                        alt={ele}
+                        width={100}
+                        height={100}
+                        className="w-40 h-40 object-contain"
+                      />
+
+                      <div className="ml-3 sm:ml-4 md:ml-6">
+                        <p className="text-base sm:text-lg md:text-xl font-medium">
+                          {ele}
+                        </p>
+                        <p className="text-sm sm:text-base md:text-lg">
+                          ₹ {(idx as cartItemFormat).price}
+                        </p>
+                        <p className="text-xs sm:text-sm md:text-md text-gray-400">
+                          Qty: {(idx as cartItemFormat).quantity}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollArea>
+              <div className="mt-4 sm:mt-6 md:mt-8 border-t border-gray-700 pt-3 sm:pt-4 md:pt-6">
+                  <p className="text-lg sm:text-xl md:text-2xl font-semibold">
+                    Subtotal: ₹ {total}
+                  </p>
+                  <button
+                    onClick={handlePayment}
+                    className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg"
+                  >
+                    Proceed to Checkout
+                  </button>
+                </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <FiAlertCircle className="text-xl text-gray-400 mr-2" />
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg">
+                Your cart is empty!
+              </p>
+            </div>
           )}
-        </div>
-        <div>
-          <input
-            type="text"
-            name="email"
-            placeholder="Email"
-            value={formData ? formData.email : ""}
-            onChange={handleInputChange}
-            className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-          />
-          {errors.email && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">
-              {errors.email}
-            </p>
-          )}
-        </div>
-        <div>
-          <textarea
-            name="address"
-            placeholder="Street Address"
-            value={formData ? formData.address : ""}
-            onChange={handleInputChange}
-            className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-            rows={3}
-          />
-          {errors.address && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">
-              {errors.address}
-            </p>
-          )}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-          <div>
-            <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={formData ? formData.city : ""}
-              onChange={handleInputChange}
-              className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-            />
-            {errors.city && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">
-                {errors.city}
-              </p>
-            )}
-          </div>
-          <div>
-            <input
-              type="text"
-              name="state"
-              placeholder="State"
-              value={formData ? formData.state : ""}
-              onChange={handleInputChange}
-              className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-            />
-            {errors.state && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">
-                {errors.state}
-              </p>
-            )}
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6">
-          <div>
-            <input
-              type="text"
-              name="zipCode"
-              placeholder="ZIP Code"
-              value={formData ? formData.zipCode : ""}
-              onChange={handleInputChange}
-              className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-            />
-            {errors.zipCode && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">
-                {errors.zipCode}
-              </p>
-            )}
-          </div>
-          <div>
-            <input
-              type="text"
-              name="country"
-              placeholder="Country"
-              value={formData ? formData.country : ""}
-              onChange={handleInputChange}
-              className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
-            />
-            {errors.country && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">
-                {errors.country}
-              </p>
-            )}
-          </div>
         </div>
       </div>
     </div>
-
-    {/* Right Section: Cart (Scrollable Items) */}
-    <div className="w-full md:w-1/2 bg-gray-900 p-4 sm:p-6 md:p-8 text-white flex flex-col h-[50vh] sm:h-[60vh] md:h-full">
-      
-      {data && data.cart && Object.entries(data.cart).length > 0 ? (
-        <div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8">
-            Your Cart
-          </h2>
-
-          {/* Scrollable Cart Items */}
-          <ScrollArea className="flex-1 overflow-y-auto">
-            <ul className="divide-y divide-gray-700">
-              {Object.entries(data.cart).map(([ele, idx]) => (
-                <li
-                  key={ele}
-                  className="flex py-3 sm:py-4 md:py-6 items-center"
-                >
-                  <Image
-                    src={(idx as data).imageUrl}
-                    alt={ele}
-                    width={60}
-                    height={60}
-                    className="rounded-md w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain"
-                  />
-                  <div className="ml-3 sm:ml-4 md:ml-6">
-                    <p className="text-base sm:text-lg md:text-xl font-medium">
-                      {ele}
-                    </p>
-                    <p className="text-sm sm:text-base md:text-lg">
-                      ₹ {(idx as data).price}
-                    </p>
-                    <p className="text-xs sm:text-sm md:text-md text-gray-400">
-                      Qty: {(idx as data).quantity}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 sm:mt-6 md:mt-8 border-t border-gray-700 pt-3 sm:pt-4 md:pt-6">
-              <p className="text-lg sm:text-xl md:text-2xl font-semibold">
-                Subtotal: ₹ {total}
-              </p>
-              <button
-                onClick={handlePayment}
-                className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg"
-              >
-                Proceed to Checkout
-              </button>
-            </div>
-          </ScrollArea>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-full">
-          <FiAlertCircle className="text-xl text-gray-400 mr-2" />
-          <p className="text-gray-400 text-sm sm:text-base md:text-lg">
-            Your cart is empty!
-          </p>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-
   );
 }

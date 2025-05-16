@@ -1,6 +1,7 @@
 export interface userDataFormat {
   userPhone: string;
   userName?: string;
+  userPassword?: string
 }
 
 export interface cartData {
@@ -27,17 +28,15 @@ export type User = {
   id: string;
   name: string;
   phone: string;
-  createdAt: string; // ISO date string
-  updatedAt: string; // ISO date string
-  address: string;
-  totalCartprice: number;
+  createdAt: string; 
+  updatedAt: string; 
 };
 
 export type perfumeData = {
   name: string;
   price: number;
   imageUrl: string;
-  discription: string;
+  discription?: string;
 };
 
 export type paymentResponse = {
@@ -80,12 +79,12 @@ export interface paymentApiResponse {
   payload?: paymentResponsePayload; // Mark `payload` as optional
 }
 
-export type data = {
+export type cartItemFormat = {
   imageUrl: string,
   price: number;
   quantity: number;
 };
-export type NumberRecord = Record<string, data>;
+export type NumberRecord = Record<string, cartItemFormat>;
 export type cartDataProps = {
   cart: NumberRecord;
   total: number;

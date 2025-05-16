@@ -1,8 +1,16 @@
 "use client";
 import { toast } from "react-toastify";
-import { Input, Button, VStack, Box, Text, Grid } from "@chakra-ui/react";
+import {
+  Input,
+  Button,
+  VStack,
+  Box,
+  Text,
+  Flex
+} from "@chakra-ui/react";
+import { Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { clearError, clearOtpWait } from "@/slices/authSlice";
+import { clearError, clearSuccess } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
 import { login } from "@/slices/authSlice";
 import { useRouter } from "next/navigation";
@@ -19,6 +27,7 @@ const Login: React.FC<props> = ({ name }) => {
 
   const [formData, setFormData] = useState({
     userPhone: "",
+    userPassword: "",
   });
 
   const onChange = (e) => {
@@ -28,22 +37,34 @@ const Login: React.FC<props> = ({ name }) => {
     }));
   };
 
-  const { userPhone } = formData;
+  const { userPhone, userPassword } = formData;
   const dispatch = useAppDispatch();
-  const { otpWait, isError, message } = useSelector(
+  const { isError, message, isSuccess, isLoggedin, isLoading } = useSelector(
     (state: RootState) => state.auth
   );
 
   useEffect(() => {
     if (isError) {
+      console.log(message);
       toast.error(message);
       dispatch(clearError());
     }
-  }, [isError, dispatch, message]);
+
+    if (isSuccess) {
+      toast.success("Login Successful!");
+      dispatch(clearSuccess());
+      router.push("/home");
+    }
+  }, [isError, dispatch, isLoggedin, router, isSuccess]);
 
   const handleClick = async () => {
-    if (userPhone.length!==10) {
+    if (userPhone.length !== 10) {
       toast.error("Phone number must have 10 digits.");
+      return;
+    }
+
+    if (userPassword === "") {
+      toast.error("Password field cannot be empty.");
       return;
     }
     await dispatch(login(formData));
@@ -51,16 +72,10 @@ const Login: React.FC<props> = ({ name }) => {
   };
 
   const handleClose = () => {
-    dispatch(clearOtpWait());
-    dispatch(toggleCartDrawer())
+    dispatch(toggleCartDrawer());
     setFadeOut(true);
-    router.push("/home")
+    router.push("/home");
   };
-
-  if (otpWait) {
-    sessionStorage.setItem("prevPath", window.location.pathname);
-    router.push("/otpverify");
-  }
 
   return (
     <>
@@ -98,7 +113,7 @@ const Login: React.FC<props> = ({ name }) => {
           border="1px solid"
           borderColor="gray.700"
           boxShadow="xl"
-          fontSize="2rem"
+          fontSize="1rem"
           zIndex="1001"
           position="relative"
         >
@@ -135,43 +150,59 @@ const Login: React.FC<props> = ({ name }) => {
                 value={userPhone}
               />
             </Box>
-            <Grid templateColumns="1fr 1fr">
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px white solid"
-              borderRadius="1rem"
-              color="white"
-              cursor="pointer"
-              transition="0.2s ease-out"
-              margin="1rem"
-              _hover={{
-                bg: "pink",
-                color: "black",
-              }}
-              onClick={handleClick}
-            >
-               Login
+            <Box>
+              <Text fontSize="lg" mb={1}>
+                Password
+              </Text>
+              <Input
+                bg="gray.800"
+                borderColor="gray.600"
+                _focus={{ borderColor: "pink.400", boxShadow: "0 0 8px pink" }}
+                onChange={onChange}
+                name="userPassword"
+                value={userPassword}
+              />
             </Box>
-            <Box
-              display="flex"
-              justifyContent="center"
-              border="1px white solid"
-              color="white"
-              borderRadius="1rem"
-              margin="1rem"
-              transition="0.2s ease-out"
-              cursor="pointer"
-              _hover={{
-                bg: "pink",
-                color: "black",
-              }}
-              onClick={()=>router.push("/register")}
-            >
-               Sign Up
-            </Box>
-            </Grid>
+            <Flex direction="column" align="center" justify="center">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                border="1px white solid"
+                borderRadius="1rem"
+                transition="0.2s ease-out"
+                color="white"
+                cursor="pointer"
+                padding="0.5rem 2rem"
+                fontSize="1.5rem"
+                margin="1rem"
+                _hover={{
+                  bg: "pink",
+                  color: "black",
+                }}
+                onClick={handleClick}
+              >
+                {isLoading ? (
+                  <Loader2 className="animate-spin text-white-400" />
+                ) : (
+                  "Sign In"
+                )}
+              </Box>
+
+              <Text color="white" mt="0.5rem">
+                Don’t have an account?{" "}
+                <Box
+                  as="span"
+                  color="pink"
+                  cursor="pointer"
+                  fontWeight="bold"
+                  _hover={{ textDecoration: "underline" }}
+                  onClick={() => router.push("/register")}
+                >
+                  Sign up
+                </Box>
+              </Text>
+            </Flex>
           </VStack>
         </Box>
       </Box>

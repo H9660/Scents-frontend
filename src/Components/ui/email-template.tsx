@@ -1,6 +1,6 @@
 import * as React from "react";
 import { emailData, NumberRecord } from "@/slices/types";
-
+import Image from "next/image"
 export const EmailTemplate: React.FC<Readonly<emailData>> = ({
   email,
   transactionId,
@@ -69,7 +69,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                     borderBottom: "1px solid #e0e0e0",
                   }}
                 >
-                  <img
+                  <Image
                     src={idx.imageUrl}
                     alt={ele}
                     width="60"

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { defaultUser, User } from "@/slices/types.ts";
 import {
   Box,
@@ -26,6 +26,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/Components/ui/drawer";
+import { useSelector } from "react-redux";
+import { RootState } from "@/slices/store";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
@@ -34,9 +36,8 @@ const Navbar = () => {
     { label: "Cart", url: "/shoppingcart" },
   ];
   const [isVisible, setIsVisible] = useState(false);
-
+  const { isLoggedin } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    // Trigger the fade-in effect after the component mounts
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -44,9 +45,9 @@ const Navbar = () => {
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(currUser);
-  }, []);
+  }, [isLoggedin]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setSmall(window.innerWidth < 800);
     };
@@ -99,20 +100,29 @@ const Navbar = () => {
               fontSize="30px"
             >
               {navUrls.map((link) => (
-                <Button key={link.url} onClick={() => navigate(link.url)}>
-                  {link.label}
-                </Button>
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.url)}
+                  className="relative group"
+                >
+                  <span className="relative">{link.label}</span>
+                  <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                </button>
               ))}
 
-              <Button
+              <button
                 key={user?.name}
                 onClick={() => {
                   if (user?.name) navigate(`/users/${user?.name}`);
                   else navigate("/login");
                 }}
+                className="relative group"
               >
-                {user.name ? user.name.split(" ")[0] : "Login"}
-              </Button>
+                <span className="relative">
+                  {user?.name ? user?.name.split(" ")[0] : "Login"}
+                </span>
+                <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+              </button>
             </Box>
           )}
 

@@ -2,27 +2,37 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { Button, Image, Grid, Box, Text} from "@chakra-ui/react";
-import { Spinner } from "@/Components/ui/spinner.tsx";
-import { addToCart } from "../slices/authSlice.ts";
+import { Button, Image, Grid, Box, Text } from "@chakra-ui/react";
+import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { Loader2 } from "lucide-react";
 import { defaultUser, perfumeData } from "@/slices/types.ts";
 import { User } from "@/slices/types.ts";
 import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const [user, setUser] = useState<User>(defaultUser)
-  const { isLoading } = useSelector((state: RootState) => state.auth);
+  const [user, setUser] = useState<User>(defaultUser);
+  const { isLoading, cartUpdated, message } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const [currButtontoCart, setCurrButtontoCart] = useState("");
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(user);  
+    setUser(user);
   }, []);
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  useEffect(() => {
+    if (cartUpdated) {
+      toast.success("Added to cart successfully");
+      dispatch(resetCartUpdated());
+    }
+
+    if(message!=="")
+    toast.error(message)
+  }, [cartUpdated, message]);
+
   return (
     <>
       <div className="mainDiv">
@@ -30,9 +40,9 @@ export default function Shoppingpage({ perfumesData = [] }) {
           fontFamily="Great Vibes"
           textAlign="center"
           color="white"
-          fontSize={{md: "8xl", base: "6xl"}}
-          marginTop={{base: "5%", md: "4%", lg: "3%"}}
-          marginBottom={{base: "5%", md: "4%", lg: "3%"}}
+          fontSize={{ md: "8xl", base: "6xl" }}
+          marginTop={{ base: "5%", md: "4%", lg: "3%" }}
+          marginBottom={{ base: "5%", md: "4%", lg: "3%" }}
         >
           Our latest arrivals
         </Box>
@@ -99,17 +109,24 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     fontSize="1rem"
                     _hover={{ bg: "white", color: "black" }}
                     onClick={async () => {
-                      if (!user) return router.push("/login");
+                      setCurrButtontoCart(link.name);
+                      if (!user) {
+                        router.push("/login");
+                        return;
+                      }
                       await dispatch(
                         addToCart({
                           userId: (user as User).id,
                           cart: { [link.name]: 1 },
                         })
                       );
-                      toast.success("Added to cart successfully");
                     }}
                   >
-                    Add to cart
+                    {isLoading && currButtontoCart === link.name ? (
+                      <Loader2 className="animate-spin text-white-400" />
+                    ) : (
+                      "Add to cart"
+                    )}
                   </Button>
 
                   <Button
@@ -122,16 +139,16 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     borderRadius="4px"
                     width="33%"
                     _hover={{ bg: "pink", color: "black" }}
-                    onClick={() =>
-                      {dispatch(setCurrentPerfume(link))
+                    onClick={() => {
+                      dispatch(setCurrentPerfume(link));
                       router.push(
                         `/perfumeContext?name=${link.name}&url=${
                           link.imageUrl
                         }&price=${link.price || 1000}`
-                      )}
-                    }
+                      );
+                    }}
                   >
-                    Buy now
+                    Buy Now
                   </Button>
                 </Box>
               </Box>
