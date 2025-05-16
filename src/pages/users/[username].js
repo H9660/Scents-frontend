@@ -4,10 +4,13 @@ import { Spinner } from "@/Components/ui/spinner";
 import { defaultUser } from "@/slices/types";
 import { logout } from "@/slices/authSlice";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
+import axios from "axios";
 const getUser = async (id) => {
-  const response = await fetch(`/api/users/getOrders?userId=${id}`);
-  const data = await response.json();
-  return data;
+  if (!id) return;
+  const response = await axios.get(`/api/users/getOrders?${id}`, {
+    withCredentials: true,
+  });
+  return response
 };
 
 export default function UserAccount() {
@@ -26,17 +29,16 @@ export default function UserAccount() {
     setIsLoadingUser(false);
   }, []);
 
-  const { data, error, isLoading } = useSWR(curruser?.id ? "orders" : {}, () =>
+  const { data, error, isLoading } = useSWR(curruser?.id ? "myorders" : {}, () =>
     getUser(curruser.id)
   );
-
+  console.log(data)
   if (error) return <div className="text-white">Failed to load user data.</div>;
   if (isLoadingUser || isLoading) return <Spinner />;
 
   return (
     <div className="text-white flex justify-center items-center min-h-screen p-6">
       <div className="bg-gray-800 p-6 rounded-3xl w-full max-w-4xl max-h-5xl h-[900px] shadow-lg flex flex-col sm:flex-row">
-        {/* Sidebar */}
         <div className="sm:w-1/3 border-b sm:border-b-0 sm:border-r border-gray-600 pr-4 mb-4 sm:mb-0 sm:flex sm:flex-col">
           <button
             className={`w-full text-center py-2 px-4 rounded-lg ${
@@ -65,7 +67,6 @@ export default function UserAccount() {
           </button>
         </div>
 
-        {/* Content */}
         <div className="sm:w-2/3 pl-0 sm:pl-4">
           {activeTab === "details" && (
             <div className="mt-6 space-y-4 text-gray-300">
@@ -81,7 +82,7 @@ export default function UserAccount() {
 
               <div>
                 <strong>Address:</strong>{" "}
-                <span className="ml-2">{address.city}</span>
+                <span className="ml-2">{address.address}</span>
               </div>
 
               <div>
@@ -94,7 +95,7 @@ export default function UserAccount() {
               <div>
                 <strong>Orders Placed:</strong>{" "}
                 <span className="ml-2 text-green-400">
-                  {data.orders.length}
+                  {data ? data.data.orders.length : 0}
                 </span>
               </div>
 
@@ -179,7 +180,7 @@ export default function UserAccount() {
           {activeTab === "orders" && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Your Orders</h2>
-              {data.orders.length === 0 ? (
+              {data.data.orders.length === 0 ? (
                 <p className="text-gray-400">No orders yet.</p>
               ) : (
                 <div className="max-h-64 overflow-y-auto rounded-lg">

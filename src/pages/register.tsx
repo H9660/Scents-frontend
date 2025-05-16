@@ -1,9 +1,9 @@
 "use client";
 import { toast } from "react-toastify";
-import { Input, Button, VStack, Box, Text, Grid } from "@chakra-ui/react";
+import { Input, Button, VStack, Box, Text, Flex } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
-import { Spinner } from "@/Components/ui/spinner";
-import { clearError, clearOtpWait, register } from "@/slices/authSlice";
+import { Loader2 } from "lucide-react";
+import { clearError, register } from "@/slices/authSlice";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/slices/store";
@@ -13,13 +13,14 @@ interface props {
   name: string;
 }
 
-const Register: React.FC<props> = ({ name}) => {
+const Register: React.FC<props> = ({ name }) => {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
 
   const [formData, setFormData] = useState({
     userPhone: "",
     userName: "",
+    userPassword: "",
   });
 
   const onChange = (e) => {
@@ -29,9 +30,9 @@ const Register: React.FC<props> = ({ name}) => {
     }));
   };
 
-  const { userName, userPhone } = formData;
+  const { userName, userPhone, userPassword } = formData;
   const dispatch = useAppDispatch();
-  const { isLoading, otpWait, isError, message } = useSelector(
+  const { isLoading, isError, message } = useSelector(
     (state: RootState) => state.auth
   );
 
@@ -41,10 +42,15 @@ const Register: React.FC<props> = ({ name}) => {
       dispatch(clearError());
     }
   }, [isError, dispatch, message]);
-                                          
+
   const handleClick = () => {
-    if (userPhone === "" || userName==="") {
+    if (userPhone === "" || userName === "" || userPassword === "") {
       toast.error("Please fill all the details.");
+      return;
+    }
+
+    if (userPhone.length !== 10) {
+      toast.error("Phone number must have 10 digits.");
       return;
     }
     dispatch(register(formData));
@@ -52,18 +58,9 @@ const Register: React.FC<props> = ({ name}) => {
   };
 
   const handleClose = () => {
-    dispatch(clearOtpWait())
     setFadeOut(true);
-    setTimeout(() => router.back(), 300); // Delay to match fade-out animation
+    setTimeout(() => router.back(), 300);
   };
-
-  if (isLoading) {
-    return <Spinner />;
-  }
-
-  if (otpWait) {
-    router.push("/otpverify");
-  }
 
   return (
     <>
@@ -79,7 +76,6 @@ const Register: React.FC<props> = ({ name}) => {
         zIndex="1000"
         className={fadeOut ? "fade-out" : ""}
       >
-        {/* Backdrop with blur */}
         <Box
           position="absolute"
           top="0"
@@ -91,7 +87,6 @@ const Register: React.FC<props> = ({ name}) => {
           onClick={handleClose}
         />
 
-        {/* Modal Content */}
         <Box
           bg="gray.900"
           color="white"
@@ -106,7 +101,6 @@ const Register: React.FC<props> = ({ name}) => {
           zIndex="1001"
           position="relative"
         >
-          {/* Close button */}
           <Button
             position="absolute"
             top="10px"
@@ -127,18 +121,18 @@ const Register: React.FC<props> = ({ name}) => {
           </Text>
 
           <VStack spaceY={4} align="stretch">
-              <Box>
-                <Text fontSize="lg" mb={1}>
-                  Name
-                </Text>
-                <Input
-                  bg="gray.800"
-                  borderColor="gray.600"
-                  onChange={onChange}
-                  name="userName"
-                  value={userName}
-                />
-              </Box>
+            <Box>
+              <Text fontSize="lg" mb={1}>
+                Name
+              </Text>
+              <Input
+                bg="gray.800"
+                borderColor="gray.600"
+                onChange={onChange}
+                name="userName"
+                value={userName}
+              />
+            </Box>
             <Box>
               <Text fontSize="lg" mb={1}>
                 Phone Number
@@ -151,41 +145,58 @@ const Register: React.FC<props> = ({ name}) => {
                 value={userPhone}
               />
             </Box>
-            <Grid templateColumns="1fr 1fr">
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px white solid"
-              borderRadius="1rem"
-              color="white"
-              margin="1rem"
-              _hover={{
-                bgGradient: "linear(to-r, pink.400, pink.600)",
-                color: "white",
-              }}
-              onClick={()=>router.push("/login")}
-            >
-               Login
+            <Box>
+              <Text fontSize="lg" mb={1}>
+                Password
+              </Text>
+              <Input
+                bg="gray.800"
+                borderColor="gray.600"
+                onChange={onChange}
+                name="userPassword"
+                value={userPassword}
+              />
             </Box>
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              border="1px white solid"
-              borderRadius="1rem"
-              color="white"
-              cursor="pointer"
-              margin="1rem"
-              _hover={{
-                bgGradient: "linear(to-r, pink.400, pink.600)",
-                color: "white",
-              }}
-              onClick={handleClick}
-            >
-               Sign Up
-            </Box>
-            </Grid>
+            <Flex direction="column" align="center" justify="center">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                border="1px white solid"
+                borderRadius="1rem"
+                transition="0.2s ease-out"
+                color="white"
+                cursor="pointer"
+                padding="0.5rem 2rem"
+                fontSize="1.5rem"
+                margin="1rem"
+                _hover={{
+                  bg: "pink",
+                  color: "black",
+                }}
+                onClick={handleClick}
+              >
+                {isLoading ? (
+                  <Loader2 className="animate-spin text-white-400" />
+                ) : (
+                  "Sign Up"
+                )}
+              </Box>
+
+              <Text color="white" mt="0.5rem" fontSize="1rem">
+                Alredy have an account?{" "}
+                <Box
+                  as="span"
+                  color="pink"
+                  cursor="pointer"
+                  fontWeight="bold"
+                  _hover={{ textDecoration: "underline" }}
+                  onClick={() => router.push("/login")}
+                >
+                  Sign In
+                </Box>
+              </Text>
+            </Flex>
           </VStack>
         </Box>
       </Box>
@@ -210,4 +221,4 @@ const Register: React.FC<props> = ({ name}) => {
   );
 };
 
-export default Register
+export default Register;
