@@ -1,5 +1,5 @@
 import axios from "axios";
-import { perfumeUpdateDataFormat } from "../slices/types.ts";
+import { perfumeUpdateDataFormat } from "../types.ts";
 const API_URL = "api/perfume/";
 
 const createperfume = async (perfumeData: perfumeUpdateDataFormat) => {

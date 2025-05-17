@@ -29,7 +29,8 @@ export type User = {
   name: string;
   phone: string;
   createdAt: string; 
-  updatedAt: string; 
+  updatedAt?: string; 
+  token?: string;
 };
 
 export type perfumeData = {

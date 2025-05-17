@@ -1,6 +1,6 @@
 import axios from "axios";
-import { userDataFormat } from "../slices/types.ts";
-import { cartData } from "../slices/types.ts";
+import { userDataFormat } from "../types.ts";
+import { cartData } from "../types.ts";
 const USER_URL = "/api/users/";
 
 const login = async (loginData: userDataFormat) => {

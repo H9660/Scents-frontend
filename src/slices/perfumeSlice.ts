@@ -1,22 +1,21 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import perfumeService from "../services/perfumeService.ts";
-import { perfumeData, perfumeUpdateDataFormat} from "./types";
+import { perfumeData, perfumeUpdateDataFormat } from "../types.ts";
 const defaultperfume = {
   name: "",
   price: 500,
   quantity: "SMALL",
   imageUrl: "",
-  discription: ""
+  discription: "",
 };
 
 const initialState = {
-  perfume: { ...defaultperfume },
   perfumes: [] as perfumeData[],
   isError: false,
   isSuccess: false,
   perfumeLoading: false,
   message: "",
-  currPerfume: {...defaultperfume}
+  currPerfume: { ...defaultperfume },
 };
 
 // Create new perfume
@@ -100,9 +99,10 @@ export const perfumeSlice = createSlice({
     // here the partial thing is used because I just wanna update the currperfume only
     setCurrentPerfume: (state, action: PayloadAction<Partial<perfumeData>>) => {
       state.currPerfume = { ...state.currPerfume, ...action.payload };
-    }
-    
-
+    },
+    setAvailablePerfumes: (state, action: PayloadAction<perfumeData[]>) => {
+      state.perfumes = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -138,11 +138,12 @@ export const perfumeSlice = createSlice({
       .addCase(getperfume.fulfilled, (state, action) => {
         state.perfumeLoading = false;
         state.isSuccess = true;
-        state.perfume = action.payload;
+        state.currPerfume = action.payload;
       })
       .addCase(getperfume.rejected, (state, action) => {
         state.perfumeLoading = false;
         state.isError = true;
+        state.currPerfume = defaultperfume;
         state.message = JSON.stringify(action.payload);
       })
       .addCase(updateperfume.pending, (state) => {
@@ -156,9 +157,10 @@ export const perfumeSlice = createSlice({
         state.perfumeLoading = false;
         state.isError = true;
         state.message = JSON.stringify(action.payload);
-      })
+      });
   },
 });
 
-export const { reset, setCurrentPerfume } = perfumeSlice.actions;
+export const { reset, setCurrentPerfume, setAvailablePerfumes } =
+  perfumeSlice.actions;
 export default perfumeSlice.reducer;

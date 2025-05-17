@@ -1,5 +1,5 @@
 import * as React from "react";
-import { emailData, NumberRecord } from "@/slices/types";
+import { emailData, NumberRecord } from "@/types";
 import Image from "next/image"
 export const EmailTemplate: React.FC<Readonly<emailData>> = ({
   email,
