@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Spinner } from "@/Components/ui/spinner";
-import { defaultUser } from "@/slices/types";
+import { defaultUser } from "@/types";
 import { logout } from "@/slices/authSlice";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import axios from "axios";

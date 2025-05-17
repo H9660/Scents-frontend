@@ -7,9 +7,9 @@ import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { Loader2 } from "lucide-react";
-import { defaultUser, perfumeData } from "@/slices/types.ts";
-import { User } from "@/slices/types.ts";
-import { setCurrentPerfume } from "@/slices/perfumeSlice.ts";
+import { defaultUser, perfumeData } from "@/types.ts";
+import { User } from "@/types.ts";
+import { setCurrentPerfume, setAvailablePerfumes } from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -28,10 +28,13 @@ export default function Shoppingpage({ perfumesData = [] }) {
       toast.success("Added to cart successfully");
       dispatch(resetCartUpdated());
     }
-
     if(message!=="")
     toast.error(message)
   }, [cartUpdated, message]);
+  
+  useEffect(()=>{
+    dispatch(setAvailablePerfumes(perfumesData))
+  }, [perfumesData])
 
   return (
     <>
@@ -142,9 +145,7 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     onClick={() => {
                       dispatch(setCurrentPerfume(link));
                       router.push(
-                        `/perfumeContext?name=${link.name}&url=${
-                          link.imageUrl
-                        }&price=${link.price || 1000}`
+                        `/perfumeContext?name=${link.name}`
                       );
                     }}
                   >

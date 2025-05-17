@@ -1,16 +1,17 @@
 "use client";
 import { useEffect } from "react";
-import { defaultUser, User } from "@/slices/types.ts";
+import { defaultUser, User } from "@/types.ts";
 import {
   Box,
   Image,
   Heading,
   Button,
-  Container,
   VStack,
   Separator,
 } from "@chakra-ui/react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import ProfileButton from "./ui/profileButton.tsx";
+import SearchBar from "./ui/searchbar.tsx";
+import { Bars3Icon, UserIcon } from "@heroicons/react/24/outline";
 import logo from "../images/logo.png";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -31,17 +32,24 @@ import { RootState } from "@/slices/store";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
+  const [isVisible, setIsVisible] = useState(false);
   const navUrls = [
     { label: "Home", url: "/home" },
-    { label: "Cart", url: "/shoppingcart" },
+    { label: "Shop", url: "/home" },
   ];
-  const [isVisible, setIsVisible] = useState(false);
+
   const { isLoggedin } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
+
+  const navigate = (url: string) => {
+    router.push(url);
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
-  const router = useRouter();
+
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(currUser);
@@ -57,23 +65,19 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize); // Cleanup on unmount
   }, []);
 
-  const navigate = (url: string) => {
-    router.push(url);
-  };
   return (
     <>
-      <Container marginTop="2rem" fontFamily="Sirin Stencil">
+      <Box marginBottom="1rem" fontFamily="Sirin Stencil">
         <Box
           display="flex"
           padding="10px"
           margin="auto"
           height="auto"
           flexWrap="wrap"
-          border="1px solid gray"
+          borderBottom="1px solid gray"
           backgroundColor="black"
           justifyContent="space-between"
           alignItems="center"
-          width="min(90%, 1200px)"
         >
           <Box display="flex" gap={1} alignItems="center">
             <Image
@@ -94,36 +98,35 @@ const Navbar = () => {
           </Box>
 
           {!small && (
-            <Box
-              display={{ base: "none", md: "flex" }}
-              gap={10}
-              fontSize="30px"
-            >
-              {navUrls.map((link) => (
-                <button
-                  key={link.label}
-                  onClick={() => navigate(link.url)}
-                  className="relative group"
-                >
-                  <span className="relative">{link.label}</span>
-                  <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
-                </button>
-              ))}
-
-              <button
-                key={user?.name}
-                onClick={() => {
-                  if (user?.name) navigate(`/users/${user?.name}`);
-                  else navigate("/login");
-                }}
-                className="relative group"
+            <>
+              <Box
+                marginLeft="103px"
+                flex="1"
+                display="flex"
+                justifyContent="center"
               >
-                <span className="relative">
-                  {user?.name ? user?.name.split(" ")[0] : "Login"}
-                </span>
-                <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
-              </button>
-            </Box>
+                <SearchBar small={small} />
+              </Box>
+
+              <Box
+                display={{ base: "none", md: "flex" }}
+                gap={10}
+                fontSize="30px"
+              >
+                {navUrls.map((link) => (
+                  <button
+                    key={link.label}
+                    onClick={() => navigate(link.url)}
+                    className="relative group"
+                  >
+                    <span className="relative">{link.label}</span>
+                    <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
+                  </button>
+                ))}
+
+                <ProfileButton user={user} />
+              </Box>
+            </>
           )}
 
           {small && (
@@ -186,7 +189,7 @@ const Navbar = () => {
                         w="full"
                         _hover={{ bg: "pink", color: "black" }}
                       >
-                        {user?.name ? user.name.split(" ")[0] : "Login"}
+                        {user?.name ? <UserIcon /> : "Login"}
                       </Button>
                     </VStack>
                   </DrawerBody>
@@ -209,7 +212,7 @@ const Navbar = () => {
             </>
           )}
         </Box>
-      </Container>
+      </Box>
     </>
   );
 };
