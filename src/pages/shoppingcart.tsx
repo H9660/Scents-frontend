@@ -43,7 +43,7 @@ export default function CheckoutPage() {
       if (!savedUser) throw new Error("User not found");
 
       const userCart = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_KEY}api/users/getCart?userId=${savedUser.id}`,
+        `api/users/getCart?userId=${savedUser.id}`,
         {
           withCredentials: true,
         }
