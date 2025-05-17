@@ -5,14 +5,14 @@ import { FiAlertCircle } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
-import { User } from "@/slices/types.ts";
+import { User } from "@/types";
 import axios from "axios";
 import {
   RazorpayOptions,
   RazorpayInstance,
   defaultUser,
   cartItemFormat,
-} from "@/slices/types.ts";
+} from "@/types";
 import Image from "next/image";
 import { createTransaction } from "@/utils/paymentUtil";
 

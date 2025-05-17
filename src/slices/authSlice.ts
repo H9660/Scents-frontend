@@ -1,8 +1,8 @@
 "use client";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "../services/authService";
-import { cartData } from "./types";
-import { userDataFormat } from "./types";
+import { cartData } from "../types";
+import { userDataFormat } from "../types";
 const savedUser =
   typeof window !== "undefined" ? localStorage.getItem("savedUser") : null;
 
