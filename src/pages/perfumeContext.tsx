@@ -1,148 +1,198 @@
-"use-client";
+"use client";
+
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { Image, Button, Text, Box, Center } from "@chakra-ui/react";
-import { Loader2 } from "lucide-react";
+import {
+  Center,
+  Grid,
+  Image,
+  Box,
+  Text,
+  Button,
+  VStack,
+  Flex,
+  Portal,
+  Select,
+  createListCollection,
+} from "@chakra-ui/react";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
-import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
-import { User, defaultUser } from "@/types.ts";
+import { addToCart } from "../slices/authSlice.ts";
+import { User } from "@/types.ts";
 import { RootState } from "@/slices/store.ts";
-import { getperfume } from "@/slices/perfumeSlice.ts";
+
 export default function PerfumeContext() {
   const router = useRouter();
-  const [user, setUser] = useState<User>(defaultUser);
-  const [currButton, setCurrButton] = useState("");
+  const [user, setUser] = useState<string | null>(null);
   const dispatch = useAppDispatch();
-  const { currPerfume, perfumeLoading } = useSelector(
-    (state: RootState) => state.perfumes
-  );
-  const { cartUpdated, isLoading } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { currPerfume } = useSelector((state: RootState) => state.perfumes);
+  const quantities = createListCollection({
+    items: [
+      { label: "SMALL", value: "5ml" },
+      { label: "MEDIUM", value: "10ml" },
+      { label: "LARGE", value: "15ml" },
+    ],
+  });
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(user);
   }, []);
 
-  useEffect(() => {
-    const { name } = router.query;
-    if (name) dispatch(getperfume(name as string));
-  }, [router.query.name]);
+  const addtoCart = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    const data = {
+      userId: (user as unknown as User).id,
+      cart: {
+        [currPerfume.name as string]: 1,
+      },
+    };
+    await dispatch(addToCart(data));
+    toast.success("Added to cart successfully. Please click on cart.");
+  };
 
-  useEffect(() => {
-    if (cartUpdated) toast.success("Added to cart successfully");
-    dispatch(resetCartUpdated());
-  }, [cartUpdated]);
+  const gotoCart = async () => {
+    await addtoCart();
+    router.push("/cart");
+  };
+
+  const totalStars = 4.5 as number;
+
+  const renderStars = (stars: number) => {
+    const fullStars = Math.floor(stars);
+    const halfStar = stars - fullStars >= 0.5;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+    return (
+      <>
+        {"★".repeat(fullStars)}
+        {halfStar && "☆"}
+        {"☆".repeat(emptyStars)}
+      </>
+    );
+  };
 
   return (
-    <Center>
+    <Center color="white" py={6} px={4} fontFamily="Sirin Stencil">
       <Box
-        key={currPerfume.name}
-        fontFamily="Sirin Stencil"
-        border="2px solid white"
-        borderRadius="1rem"
-        m="1rem"
-        p="1rem"
-        display="flex"
-        flexDirection="column"
+        maxW={{ base: "100%", md: "90%", lg: "70%" }}
+        border="1px solid white"
+        borderRadius="1.5rem"
         background="#352929"
-        textAlign="center"
-        transition="0.2s ease-in-out"
-        _hover={{
-          boxShadow: "0 0 15px 3px pink",
-          transform: "scale(1.03)",
-          borderColor: "pink",
-        }}
+        boxShadow="lg"
+        p={{ base: 4, md: 8 }}
+        bgGradient="linear(to-r, gray.900, gray.800)"
       >
-        {perfumeLoading ? (
-          <Loader2 className="animate-spin text-white-400" />
-        ) : (
-          <>
+        {/* Stars at the top */}
+        <Text
+          fontSize="lg"
+          fontWeight="bold"
+          mb={4}
+          textAlign="right"
+          color="yellow.400"
+        >
+          Rating: {renderStars(totalStars)} ({totalStars.toFixed(1)} / 5)
+        </Text>
+
+        <Grid
+          templateColumns={{ base: "1fr", md: "1fr 1fr" }}
+          gap={{ base: 6, md: 10 }}
+          alignItems="center"
+        >
+          <Center>
             <Image
-              objectFit="contain"
-              rounded="md"
               src={currPerfume.imageUrl}
               alt={currPerfume.name}
+              borderRadius="lg"
+              objectFit="cover"
+              border="1px solid white"
+              boxShadow="2xl"
               maxH="400px"
-              width="100%"
             />
-            <Box textAlign="center" mt={4}>
-              <Text
-                fontSize="2rem"
-                whiteSpace="normal"
-                lineHeight="shorter"
-                marginBottom="1rem"
-              >
-                {currPerfume.name}
-              </Text>
-              <Text fontSize="1.5rem" fontStyle="italic">
-                {currPerfume.discription}
-              </Text>
+          </Center>
 
-              <Box
-                display="flex"
-                justifyContent="space-around"
-                alignItems="center"
-                mt={7}
+          <VStack
+            alignItems="flex-start"
+            spaceY={6}
+            border="1px solid gray"
+            padding="1rem"
+          >
+            <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold">
+              {currPerfume.name}
+            </Text>
+            <Text fontSize={{ base: "1xl", md: "2xl" }} color="gray.300">
+              {currPerfume.discription}
+            </Text>
+            <Text fontSize="xl" fontWeight="bold">
+              ₹ {currPerfume.price}
+            </Text>
+
+            {/* Quantity selector + buttons */}
+            <Flex gap={4} w="full" flexWrap={{ base: "wrap", md: "nowrap" }}>
+              <Select.Root
+                collection={quantities}
+                size="sm"
+                width="150px"
+                border="1px solid white"
               >
-                <Text fontSize="3xl" fontWeight="bold" color="white">
-                  ₹ {currPerfume.price}
-                </Text>
-                <Button
-                  variant="outline"
-                  border="1px solid white"
-                  borderRadius="4px"
-                  fontWeight="bold"
-                  width="40%"
-                  padding="1rem"
-                  fontSize="1rem"
-                  _hover={{ bg: "white", color: "black" }}
-                  onClick={async () => {
-                    setCurrButton(currPerfume.name);
-                    if (!user) return router.push("/login");
-                    await dispatch(
-                      addToCart({
-                        userId: user.id,
-                        cart: { [currPerfume.name]: 1 },
-                      })
-                    );
-                  }}
-                >
-                  {isLoading && currButton === currPerfume.name ? (
-                    <Loader2 className="animate-spin text-white-400" />
-                  ) : (
-                    "Add to cart"
-                  )}
-                </Button>
-                
-                <Button
-                  color="black"
-                  backgroundColor="#FFB433"
-                  padding="1rem"
-                  position="relative"
-                  fontWeight="bold"
-                  fontSize="1rem"
-                  borderRadius="4px"
-                  width="33%"
-                  _hover={{ bg: "pink", color: "black" }}
-                  onClick={async () => {
-                    if (!user) return router.push("/login");
-                    await dispatch(
-                      addToCart({
-                        userId: (user as User).id,
-                        cart: { [currPerfume.name]: 1 },
-                      })
-                    );
-                  }}
-                >
-                  Buy now
-                </Button>
-              </Box>
-            </Box>
-          </>
-        )}
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText
+                      placeholder="Select quantity"
+                      paddingLeft="1rem"
+                    />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {quantities.items.map((quantity) => (
+                        <Select.Item item={quantity} key={quantity.value}>
+                          {quantity.label}{" ("}{quantity.value}{")"}
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root>
+              <Button
+                variant="outline"
+                colorScheme="whiteAlpha"
+                borderRadius="full"
+                px={6}
+                flex="1"
+                onClick={addtoCart}
+                background="black"
+                border="1px solid white"
+                _hover={{ bg: "white", color: "black" }}
+              >
+                Add to cart
+              </Button>
+
+              <Button
+                bg="#FFB433"
+                color="black"
+                borderRadius="full"
+                px={6}
+                fontWeight="bold"
+                flex="1"
+                onClick={gotoCart}
+                _hover={{ bg: "pink.300", color: "black" }}
+              >
+                Buy now
+              </Button>
+            </Flex>
+          </VStack>
+        </Grid>
       </Box>
     </Center>
   );
