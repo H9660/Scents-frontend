@@ -52,7 +52,6 @@ export default function PerfumeContext() {
       },
     };
     await dispatch(addToCart(data));
-    toast.success("Added to cart successfully. Please click on cart.");
   };
 
   const gotoCart = async () => {
