@@ -57,7 +57,7 @@ export default function PerfumeContext() {
 
   const gotoCart = async () => {
     await addtoCart();
-    router.push("/cart");
+    router.push("/shoppingcart");
   };
 
   const totalStars = 4.5 as number;
