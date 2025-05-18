@@ -46,7 +46,8 @@ export default function PerfumeContext() {
         m="1rem"
         p="1rem"
         display="flex"
-        flexDirection="column"
+        flexDirection={{sm: "column", lg: "row"}}
+        background="#352929"
         textAlign="center"
         transition="0.2s ease-in-out"
         _hover={{
@@ -64,7 +65,7 @@ export default function PerfumeContext() {
               rounded="md"
               src={currPerfume.imageUrl}
               alt={currPerfume.name}
-              maxH="200px"
+              maxH="400px"
               width="100%"
             />
             <Box textAlign="center" mt={4}>
@@ -115,7 +116,7 @@ export default function PerfumeContext() {
                     "Add to cart"
                   )}
                 </Button>
-
+                
                 <Button
                   color="black"
                   backgroundColor="#FFB433"

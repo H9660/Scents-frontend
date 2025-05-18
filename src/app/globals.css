@@ -11,7 +11,7 @@
 @import "tailwindcss/utilities";
 :root {
 
-  --background: #ffffff;
+  --background: #FFFFFF;
   --foreground: #171717;
 }
 
@@ -93,9 +93,9 @@ to {
 }
 
 .animated-bg {
-  background: linear-gradient(-45deg, #000000 60%, #992E3B, #9B3CA2);
+  background: linear-gradient(-45deg, #AA113C 50%, #6C096D, #e69db1);
   background-size: 300% 300%;
-  animation: gradientFlow 10s ease infinite;
+  animation: gradientFlow 5s ease infinite;
   min-height: 100vh;
   width: 100%;
 }
