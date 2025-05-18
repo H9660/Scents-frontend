@@ -46,7 +46,7 @@ export default function PerfumeContext() {
         m="1rem"
         p="1rem"
         display="flex"
-        flexDirection={{sm: "column", lg: "row"}}
+        flexDirection="column"
         background="#352929"
         textAlign="center"
         transition="0.2s ease-in-out"
@@ -77,17 +77,17 @@ export default function PerfumeContext() {
               >
                 {currPerfume.name}
               </Text>
-              <Text fontSize="1.2rem" fontStyle="italic">
+              <Text fontSize="1.5rem" fontStyle="italic">
                 {currPerfume.discription}
               </Text>
 
               <Box
                 display="flex"
-                justifyContent="space-between"
+                justifyContent="space-around"
                 alignItems="center"
                 mt={7}
               >
-                <Text fontSize="2xl" fontWeight="bold" color="white">
+                <Text fontSize="3xl" fontWeight="bold" color="white">
                   ₹ {currPerfume.price}
                 </Text>
                 <Button
@@ -95,7 +95,7 @@ export default function PerfumeContext() {
                   border="1px solid white"
                   borderRadius="4px"
                   fontWeight="bold"
-                  width="33%"
+                  width="40%"
                   padding="1rem"
                   fontSize="1rem"
                   _hover={{ bg: "white", color: "black" }}
