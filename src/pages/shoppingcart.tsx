@@ -109,8 +109,9 @@ export default function CheckoutPage() {
     });
 
     const { order } = await res.json();
+    console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!)
     const options: RazorpayOptions = {
-      key_id: process.env.RAZORPAY_KEY_ID!,
+      key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
       amount: order.amount,
       currency: "INR",
       name: "Scentdazzle",

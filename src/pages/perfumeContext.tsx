@@ -3,7 +3,6 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import {
   Center,
   Grid,
@@ -18,7 +17,7 @@ import {
   createListCollection,
 } from "@chakra-ui/react";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
-import { addToCart } from "../slices/authSlice.ts";
+import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { User } from "@/types.ts";
 import { RootState } from "@/slices/store.ts";
 
@@ -52,11 +51,11 @@ export default function PerfumeContext() {
       },
     };
     await dispatch(addToCart(data));
-    toast.success("Added to cart successfully. Please click on cart.");
   };
 
   const gotoCart = async () => {
     await addtoCart();
+    dispatch(resetCartUpdated());
     router.push("/shoppingcart");
   };
 
