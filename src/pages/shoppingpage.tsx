@@ -63,9 +63,10 @@ export default function Shoppingpage({ perfumesData = [] }) {
               key={link.name}
               fontFamily="Sirin Stencil"
               border="1px solid white"
+              background="#352929"
               borderRadius="1rem"
               padding="12px"
-              transition="0.1s ease-in-out"
+              transition="0.3s ease-in-out"
               _hover={{
                 boxShadow: "0 0 10px 2px white",
                 borderColor: "pink",

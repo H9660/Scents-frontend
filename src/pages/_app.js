@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 dotenv.config("../.env.local");
 function MyApp({ Component, pageProps }) {
   return (
+    <div className="animated-bg">
     <Provider store={store}>
       <ProvideChakra>
         <Navbar />
@@ -19,6 +20,7 @@ function MyApp({ Component, pageProps }) {
       </ProvideChakra>
       <ToastContainer />
     </Provider>
+    </div>
   );
 }
 
