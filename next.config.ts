@@ -1,4 +1,3 @@
-import { current } from "@reduxjs/toolkit";
 
 const API_URL = process.env.API_KEY;
 
@@ -12,8 +11,8 @@ const nextConfig = {
       },
       {
         source: "/sendemail",
-        destination: "/api/emails/send"
-      }
+        destination: "/api/emails/send",
+      },
     ];
   },
   async redirects() {
@@ -28,8 +27,9 @@ const nextConfig = {
 
   images: {
     domains: [process.env.IMAGE_BUCKET],
+    formats: ["image/avif", "image/webp"],
   },
+  compress: true,
 };
 
 module.exports = nextConfig;
-

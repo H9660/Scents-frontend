@@ -1,5 +1,6 @@
 "use client";
 import { ToastContainer } from "react-toastify";
+import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import { ProvideChakra } from "@/Components/ui/provider";
@@ -12,14 +13,16 @@ dotenv.config("../.env.local");
 function MyApp({ Component, pageProps }) {
   return (
     <div className="animated-bg">
-    <Provider store={store}>
-      <ProvideChakra>
-        <Navbar />
-        <Component {...pageProps} />
-        <Footer />
-      </ProvideChakra>
-      <ToastContainer />
-    </Provider>
+      <React.StrictMode>
+        <Provider store={store}>
+          <ProvideChakra>
+            <Navbar />
+            <Component {...pageProps} />
+            <Footer />
+          </ProvideChakra>
+          <ToastContainer />
+        </Provider>
+      </React.StrictMode>
     </div>
   );
 }
