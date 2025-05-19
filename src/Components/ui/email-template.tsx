@@ -1,10 +1,10 @@
 import * as React from "react";
 import { emailData, NumberRecord } from "@/types";
-import Image from "next/image"
 export const EmailTemplate: React.FC<Readonly<emailData>> = ({
   email,
   transactionId,
   cartdata,
+  address,
 }) => {
   console.log(cartdata);
   return (
@@ -30,8 +30,19 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
             borderRadius: "8px 8px 0 0",
           }}
         >
+          <img
+            src="https://scentphotos.s3.ap-south-1.amazonaws.com/logo.png"
+            alt="Scentdazzle Logo"
+            style={{
+              display: "block",
+              margin: "0 auto 15px",
+              width: "120px",
+              height: "auto",
+            }}
+          />
+
           <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "bold" }}>
-            Scents Order Confirmation
+            Scentdazzle Order Confirmation
           </h1>
           <p style={{ margin: "5px 0 0", fontSize: "14px" }}>
             Thank you for your purchase!
@@ -48,6 +59,18 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
             We’ve received your order (Transaction ID:{" "}
             <strong>{transactionId}</strong>) associated with{" "}
             <strong>{email}</strong>. Below are the details of your purchase:
+          </p>
+
+          <p
+            style={{
+              fontSize: "16px",
+              color: "#333333",
+              marginBottom: "10px",
+            }}
+          >
+            <strong>Shipping Address:</strong>
+            <br />
+            {address.address}
           </p>
 
           {/* Cart Items */}
@@ -69,10 +92,10 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                     borderBottom: "1px solid #e0e0e0",
                   }}
                 >
-                  <Image
+                  <img
                     src={idx.imageUrl}
                     alt={ele}
-                    width="60"
+                    width="100"
                     height="60"
                     className="email-images"
                   />
@@ -102,16 +125,6 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                       Quantity: {idx.quantity}
                     </p>
                   </div>
-                  <p
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      color: "#1a1a1a",
-                      margin: 0,
-                    }}
-                  >
-                    ₹ {idx.price.toLocaleString("en-IN")}
-                  </p>
                 </li>
               )
             )}
@@ -156,7 +169,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
               href="mailto:support@scents.com"
               style={{ color: "#ffd700", textDecoration: "none" }}
             >
-              support@scents.com
+              support@scentdazzle.com
             </a>
           </p>
           <p style={{ margin: 0 }}>© 2025 Scents. All rights reserved.</p>

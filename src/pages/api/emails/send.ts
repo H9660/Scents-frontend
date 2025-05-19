@@ -10,7 +10,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   console.log("Raw request:", req.method, req.headers, req.body);
-  const { name, email, transactionId, cartdata } = req.body;
+  const { name, email, transactionId, cartdata, address } = req.body;
   console.log("cart is here", cartdata);
 
   try {
@@ -18,7 +18,7 @@ export default async function handler(
       from: "Acme <onboarding@resend.dev>",
       to: [email],
       subject: `Hi ${name}`,
-      react: await EmailTemplate({ email, transactionId, cartdata, name }),
+      react: await EmailTemplate({ email, transactionId, cartdata, name, address }),
     });
 
     if (error)

@@ -14,8 +14,16 @@ export interface emailData {
   email: string;
   transactionId: string;
   cartdata: NumberRecord;
+  address: AddressFormat;
 }
 
+export type AddressFormat ={
+  address: string,
+  city: string,
+  state: string,
+  zipCode: string,
+  country: string,
+}
 export interface perfumeUpdateDataFormat {
   name: string;
   price?: number;

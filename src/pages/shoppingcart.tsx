@@ -98,7 +98,7 @@ export default function CheckoutPage() {
 
   const handlePayment = async () => {
     if (!validateForm()) return;
-
+    
     const res = await fetch(`api/payment/makePayment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -109,7 +109,6 @@ export default function CheckoutPage() {
     });
 
     const { order } = await res.json();
-    console.log(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!)
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
       amount: order.amount,
@@ -118,6 +117,7 @@ export default function CheckoutPage() {
       description: `Payment from ${user?.id}: ${data?.price}`,
       order_id: order.id,
       handler: async function (response) {
+        console.log(response)
         const verifyData = {
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
@@ -144,13 +144,15 @@ export default function CheckoutPage() {
           subtotal: data?.price || 0,
           status: status,
         });
-
+         
+        const {name, email, ...sendData} = formData
         console.log(transxnId);
         const emaildata = {
           name: formData.name,
           email: formData.email,
-          transactionId: "test",
+          transactionId: transxnId,
           cartdata: data,
+          address: sendData
         };
 
         await fetch(`/sendemail`, {
