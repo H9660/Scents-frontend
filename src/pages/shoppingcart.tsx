@@ -148,8 +148,8 @@ export default function CheckoutPage() {
         const {name, email, ...sendData} = formData
         console.log(transxnId);
         const emaildata = {
-          name: formData.name,
-          email: formData.email,
+          name: name,
+          email: email,
           transactionId: transxnId,
           cartdata: data,
           address: sendData
