@@ -6,7 +6,6 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
   cartdata,
   address,
 }) => {
-  console.log(cartdata);
   return (
     <form>
       <div
@@ -70,7 +69,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
           >
             <strong>Shipping Address:</strong>
             <br />
-            {address.address}
+               {address.street}, {address.city}, {address.state},  - {address.pincode}, {address.country}`
           </p>
 
           {/* Cart Items */}
@@ -117,7 +116,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                         margin: "0 0 5px",
                       }}
                     >
-                      ₹ {idx.price.toLocaleString("en-IN")}
+                      ₹ {idx.price}
                     </p>
                     <p
                       style={{ fontSize: "12px", color: "#888888", margin: 0 }}
@@ -147,7 +146,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                 margin: 0,
               }}
             >
-              Total: ₹ {cartdata.price.toLocaleString()}
+              Total: ₹ {cartdata.price as any}
             </p>
           </div>
         </div>

@@ -9,7 +9,10 @@ import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { Loader2 } from "lucide-react";
 import { defaultUser, perfumeData } from "@/types.ts";
 import { User } from "@/types.ts";
-import { setCurrentPerfume, setAvailablePerfumes } from "@/slices/perfumeSlice.ts";
+import {
+  setCurrentPerfume,
+  setAvailablePerfumes,
+} from "@/slices/perfumeSlice.ts";
 export default function Shoppingpage({ perfumesData = [] }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -20,7 +23,7 @@ export default function Shoppingpage({ perfumesData = [] }) {
   const [currButtontoCart, setCurrButtontoCart] = useState("");
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(user);
+    if (user) setUser(user);
   }, []);
 
   useEffect(() => {
@@ -28,13 +31,15 @@ export default function Shoppingpage({ perfumesData = [] }) {
       toast.success("Added to cart successfully");
       dispatch(resetCartUpdated());
     }
-    if(message!=="")
-    toast.error(message)
+
+    if (message === "Authentication token is missing")
+      toast.error("Please login.");
+    else if (message !== "") toast.error(message);
   }, [cartUpdated, message]);
-  
-  useEffect(()=>{
-    dispatch(setAvailablePerfumes(perfumesData))
-  }, [perfumesData])
+
+  useEffect(() => {
+    dispatch(setAvailablePerfumes(perfumesData));
+  }, [perfumesData]);
 
   return (
     <>
@@ -145,9 +150,7 @@ export default function Shoppingpage({ perfumesData = [] }) {
                     _hover={{ bg: "pink", color: "black" }}
                     onClick={() => {
                       dispatch(setCurrentPerfume(link));
-                      router.push(
-                        `/perfumeContext?name=${link.name}`
-                      );
+                      router.push(`/perfumeContext?name=${link.name}`);
                     }}
                   >
                     Buy Now

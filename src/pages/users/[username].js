@@ -4,22 +4,28 @@ import { Spinner } from "@/Components/ui/spinner";
 import { defaultUser } from "@/types";
 import { logout } from "@/slices/authSlice";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useSelector } from "react-redux";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 const getUser = async (id) => {
   if (!id) return;
   const response = await axios.get(`/api/users/getOrders?${id}`, {
     withCredentials: true,
   });
-  return response
+  console.log(response);
+  return response;
 };
 
 export default function UserAccount() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("details");
   const [curruser, setcurrUser] = useState(defaultUser);
   const [address, setAddress] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const dispatch = useAppDispatch();
+  const { isLoggedin } = useSelector((state) => state.auth);
   useEffect(() => {
     const userStr = localStorage.getItem("savedUser");
     const addressStr = localStorage.getItem("address");
@@ -29,10 +35,18 @@ export default function UserAccount() {
     setIsLoadingUser(false);
   }, []);
 
-  const { data, error, isLoading } = useSWR(curruser?.id ? "myorders" : {}, () =>
-    getUser(curruser.id)
+  useEffect(() => {
+    if (!isLoggedin) {
+      router.push("/home");
+      return;
+    }
+  }, [isLoggedin]);
+  
+  const { data, error, isLoading } = useSWR(
+    curruser?.id ? "myorders" : {},
+    () => getUser(curruser.id)
   );
-  console.log(data)
+  console.log(data);
   if (error) return <div className="text-white">Failed to load user data.</div>;
   if (isLoadingUser || isLoading) return <Spinner />;
 
@@ -194,7 +208,7 @@ export default function UserAccount() {
                       </tr>
                     </thead>
                     <tbody>
-                      {data.orders.map((order) => (
+                      {data.data.orders.map((order) => (
                         <tr
                           key={order.transactions_id}
                           className="text-center bg-gray-800"
@@ -203,7 +217,7 @@ export default function UserAccount() {
                             {order.transactions_id}
                           </td>
                           <td className="border border-gray-600 p-2">
-                            ${order.subtotal}
+                            ₹{order.subtotal}
                           </td>
                         </tr>
                       ))}

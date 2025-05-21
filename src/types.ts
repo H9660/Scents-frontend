@@ -18,10 +18,10 @@ export interface emailData {
 }
 
 export type AddressFormat ={
-  address: string,
   city: string,
+  street: string,
   state: string,
-  zipCode: string,
+  pincode: string,
   country: string,
 }
 export interface perfumeUpdateDataFormat {

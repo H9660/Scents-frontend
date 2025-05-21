@@ -52,8 +52,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(currUser);
-  }, [isLoggedin]);
+    if (currUser) setUser(currUser);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -124,7 +124,7 @@ const Navbar = () => {
                   </button>
                 ))}
 
-                <ProfileButton user={user} />
+                <ProfileButton />
               </Box>
             </>
           )}
@@ -135,7 +135,6 @@ const Navbar = () => {
                 <DrawerBackdrop />
                 <DrawerTrigger>
                   <Button
-                    // Show only on small screens
                     variant="outline"
                     size="sm"
                   >

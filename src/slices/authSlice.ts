@@ -117,6 +117,9 @@ export const authSlice = createSlice({
     resetCartUpdated: (state)=>{
       state.cartUpdated = false
     },
+    setisLoggedin: (state)=>{
+      state.isLoggedin = true
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -176,5 +179,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { reset, clearError, resetCartUpdated, clearSuccess } = authSlice.actions;
+export const { reset, clearError, resetCartUpdated, clearSuccess, setisLoggedin } = authSlice.actions;
 export default authSlice.reducer;

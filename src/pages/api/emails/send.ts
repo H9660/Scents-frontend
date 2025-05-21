@@ -9,10 +9,13 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log("Raw request:", req.method, req.headers, req.body);
   const { name, email, transactionId, cartdata, address } = req.body;
-  console.log("cart is here", cartdata);
-
+  console.log("From send")
+  console.log(name)
+  console.log(email)
+  console.log(transactionId)
+  console.log(cartdata)
+  console.log(address)
   try {
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",
