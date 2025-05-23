@@ -1,3 +1,4 @@
+"use client";
 import useSWR from "swr";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { FiAlertCircle } from "react-icons/fi";
