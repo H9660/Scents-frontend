@@ -22,7 +22,7 @@ declare global {
     Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
   }
 }
-  
+
 export default function CheckoutPage() {
   const [user, setUser] = useState<User | null>(defaultUser);
   const [total, setTotal] = useState(0);
@@ -39,8 +39,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { isLoggedin } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
-    if(!isLoggedin)
-      router.push("/home");
+    if (!isLoggedin) router.push("/home");
   }, [isLoggedin, router]);
 
   const getCart = async () => {
@@ -149,9 +148,9 @@ export default function CheckoutPage() {
           cart: data.cart,
           userId: user?.id,
         };
-         
+
         const { name, email, ...sendData } = formData;
-        console.log(formData)
+        console.log(formData);
         const transxnId = await createTransaction({
           userId: user?.id,
           razorpay_payment_id: response.razorpay_payment_id,
@@ -159,9 +158,9 @@ export default function CheckoutPage() {
           subtotal: data?.price || 0,
           orderDetails: orderDetails,
           status: status,
-          address: sendData
+          address: sendData,
         });
-        
+
         const emaildata = {
           name: name,
           email: email,

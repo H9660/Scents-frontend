@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { UserIcon } from "@heroicons/react/24/outline";
-import { logout, setisLoggedin } from "@/slices/authSlice";
+import { logout } from "@/slices/authSlice";
 import { User, defaultUser } from "@/types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/slices/store";
 export default function ProfileButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<User>(defaultUser);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { isLoggedin } = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
@@ -48,15 +48,17 @@ export default function ProfileButton() {
             <button
               onClick={() => {
                 if (user) {
-                  let savedUser = null
+                  let savedUser = defaultUser;
                   if (user.name === "") {
                     savedUser = JSON.parse(
                       localStorage.getItem("savedUser") || ""
                     );
-                    setUser(savedUser);
+                    setUser(savedUser!);
                   }
-                  router.push(`/users/${savedUser.name}`);
-                  setIsOpen(false);
+                  if (savedUser?.name) {
+                    router.push(`/users/${savedUser.name}`);
+                    setIsOpen(false);
+                  }
                 }
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
