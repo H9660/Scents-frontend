@@ -3,16 +3,14 @@ import { Resend } from "resend";
 import dotenv from "dotenv";
 import { NextApiRequest, NextApiResponse } from "next";
 dotenv.config();
-const resend = new Resend("re_XJrUCEBs_9EYuCG1tuxECNP5Xc1Xw68U2");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log("Raw request:", req.method, req.headers, req.body);
   const { name, email, transactionId, cartdata, address } = req.body;
-  console.log("cart is here", cartdata);
-
+  console.log("From send")
   try {
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",

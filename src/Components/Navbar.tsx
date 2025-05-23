@@ -27,8 +27,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/Components/ui/drawer";
-import { useSelector } from "react-redux";
-import { RootState } from "@/slices/store";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
@@ -38,7 +36,6 @@ const Navbar = () => {
     { label: "Shop", url: "/home" },
   ];
 
-  const { isLoggedin } = useSelector((state: RootState) => state.auth);
   const router = useRouter();
 
   const navigate = (url: string) => {
@@ -52,8 +49,8 @@ const Navbar = () => {
 
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(currUser);
-  }, [isLoggedin]);
+    if (currUser) setUser(currUser);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -124,7 +121,7 @@ const Navbar = () => {
                   </button>
                 ))}
 
-                <ProfileButton user={user} />
+                <ProfileButton />
               </Box>
             </>
           )}
@@ -135,7 +132,6 @@ const Navbar = () => {
                 <DrawerBackdrop />
                 <DrawerTrigger>
                   <Button
-                    // Show only on small screens
                     variant="outline"
                     size="sm"
                   >

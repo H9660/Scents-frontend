@@ -3,9 +3,14 @@ import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { UserIcon } from "@heroicons/react/24/outline";
 import { logout } from "@/slices/authSlice";
-export default function ProfileButton({ user }) {
+import { User, defaultUser } from "@/types";
+import { useSelector } from "react-redux";
+import { RootState } from "@/slices/store";
+export default function ProfileButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(defaultUser);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { isLoggedin } = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
   useEffect(() => {
@@ -14,27 +19,25 @@ export default function ProfileButton({ user }) {
         setIsOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   const handleButtonClick = () => {
-    if (user?.name) {
+    if (isLoggedin) {
       setIsOpen(!isOpen);
     } else {
       router.push("/login");
     }
   };
+
   return (
     <div className="relative inline-block text-center" ref={dropdownRef}>
-      <button
-        onMouseEnter={handleButtonClick}
-        className="relative group text-white"
-      >
+      <button onClick={handleButtonClick} className="relative group text-white">
         <span className="relative">
-          {user?.name ? <UserIcon className="size-6" /> : "Login"}
+          {isLoggedin ? <UserIcon className="size-6" /> : "Login"}
         </span>
         <span className="absolute left-0 bottom-0 h-px w-full bg-white origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"></span>
       </button>
@@ -44,8 +47,19 @@ export default function ProfileButton({ user }) {
           <div className="py-1">
             <button
               onClick={() => {
-                router.push(`/users/${user.name}`);
-                setIsOpen(false);
+                if (user) {
+                  let savedUser = defaultUser;
+                  if (user.name === "") {
+                    savedUser = JSON.parse(
+                      localStorage.getItem("savedUser") || ""
+                    );
+                    setUser(savedUser!);
+                  }
+                  if (savedUser?.name) {
+                    router.push(`/users/${savedUser.name}`);
+                    setIsOpen(false);
+                  }
+                }
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
@@ -62,16 +76,8 @@ export default function ProfileButton({ user }) {
             </button>
             <button
               onClick={() => {
-                router.push(`/users/${user.name}/orders`);
-                setIsOpen(false);
-              }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              My Orders
-            </button>
-            <button
-              onClick={() => {
                 dispatch(logout());
+                setUser(defaultUser);
                 setIsOpen(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-100"

@@ -1,4 +1,3 @@
-"use client";
 import useSWR from "swr";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { FiAlertCircle } from "react-icons/fi";
@@ -6,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
 import { User } from "@/types";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import {
   RazorpayOptions,
@@ -15,6 +15,7 @@ import {
 } from "@/types";
 import Image from "next/image";
 import { createTransaction } from "@/utils/paymentUtil";
+import { RootState } from "@/slices/store";
 
 declare global {
   interface Window {
@@ -28,19 +29,26 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
-    address: "",
+    street: "",
     city: "",
     state: "",
-    zipCode: "",
+    pincode: "",
     country: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
+  const { isLoggedin } = useSelector((state: RootState) => state.auth);
+  useEffect(() => {
+    if (!isLoggedin) router.push("/home");
+  }, [isLoggedin, router]);
 
   const getCart = async () => {
     try {
       const savedUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-      if (!savedUser) throw new Error("User not found");
+      if (!savedUser) {
+        router.push("/home");
+        return;
+      }
 
       const userCart = await axios.get(
         `api/users/getCart?userId=${savedUser.id}`,
@@ -48,7 +56,7 @@ export default function CheckoutPage() {
           withCredentials: true,
         }
       );
-      console.log(userCart);
+
       setTotal(userCart.data.price);
       return userCart.data;
     } catch (error) {
@@ -60,7 +68,6 @@ export default function CheckoutPage() {
   const { data, isLoading } = useSWR("cart", getCart, {
     revalidateOnFocus: false,
   });
-  console.log(data);
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("savedUser") || "null");
     const formData = JSON.parse(localStorage.getItem("address") || "null");
@@ -85,11 +92,11 @@ export default function CheckoutPage() {
     const newErrors: { [key: string]: string } = {};
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.address) newErrors.address = "Address is required";
+    if (!formData.street) newErrors.street = "Street address is required";
     if (!formData.city) newErrors.city = "City is required";
     if (!formData.state) newErrors.state = "State is required";
-    if (!formData.zipCode || !/^\d{5,6}$/.test(formData.zipCode))
-      newErrors.zipCode = "Valid ZIP code is required (5-6 digits)";
+    if (!formData.pincode || !/^\d{5,6}$/.test(formData.pincode))
+      newErrors.pincode = "Valid ZIP code is required (5-6 digits)";
     if (!formData.country) newErrors.country = "Country is required";
     setErrors(newErrors);
     localStorage.setItem("address", JSON.stringify(formData));
@@ -98,12 +105,12 @@ export default function CheckoutPage() {
 
   const handlePayment = async () => {
     if (!validateForm()) return;
-    
+
     const res = await fetch(`api/payment/makePayment`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: data?.price * 100,
+        amount: data.price * 100,
         userId: user?.id,
       }),
     });
@@ -117,7 +124,6 @@ export default function CheckoutPage() {
       description: `Payment from ${user?.id}: ${data?.price}`,
       order_id: order.id,
       handler: async function (response) {
-        console.log(response)
         const verifyData = {
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
@@ -137,22 +143,30 @@ export default function CheckoutPage() {
           router.push("/payments/failure");
           return;
         }
+
+        const orderDetails = {
+          cart: data.cart,
+          userId: user?.id,
+        };
+
+        const { name, email, ...sendData } = formData;
+        console.log(formData);
         const transxnId = await createTransaction({
           userId: user?.id,
           razorpay_payment_id: response.razorpay_payment_id,
           razorpay_order_id: response.razorpay_order_id,
           subtotal: data?.price || 0,
+          orderDetails: orderDetails,
           status: status,
+          address: sendData,
         });
-         
-        const {name, email, ...sendData} = formData
-        console.log(transxnId);
+
         const emaildata = {
           name: name,
           email: email,
           transactionId: transxnId,
           cartdata: data,
-          address: sendData
+          address: sendData,
         };
 
         await fetch(`/sendemail`, {
@@ -232,16 +246,16 @@ export default function CheckoutPage() {
             </div>
             <div>
               <textarea
-                name="address"
+                name="street"
                 placeholder="Street Address"
-                value={formData ? formData.address : ""}
+                value={formData ? formData.street : ""}
                 onChange={handleInputChange}
                 className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
                 rows={3}
               />
-              {errors.address && (
+              {errors.street && (
                 <p className="text-red-400 text-xs sm:text-sm mt-1">
-                  {errors.address}
+                  {errors.street}
                 </p>
               )}
             </div>
@@ -281,15 +295,15 @@ export default function CheckoutPage() {
               <div>
                 <input
                   type="text"
-                  name="zipCode"
+                  name="pincode"
                   placeholder="ZIP Code"
-                  value={formData ? formData.zipCode : ""}
+                  value={formData ? formData.pincode : ""}
                   onChange={handleInputChange}
                   className="w-full p-2 sm:p-3 bg-gray-900 text-white border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 text-sm sm:text-base md:text-lg"
                 />
-                {errors.zipCode && (
+                {errors.pincode && (
                   <p className="text-red-400 text-xs sm:text-sm mt-1">
-                    {errors.zipCode}
+                    {errors.pincode}
                   </p>
                 )}
               </div>
@@ -352,16 +366,16 @@ export default function CheckoutPage() {
                 </ul>
               </ScrollArea>
               <div className="mt-4 sm:mt-6 md:mt-8 border-t border-gray-700 pt-3 sm:pt-4 md:pt-6">
-                  <p className="text-lg sm:text-xl md:text-2xl font-semibold">
-                    Subtotal: ₹ {total}
-                  </p>
-                  <button
-                    onClick={handlePayment}
-                    className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg"
-                  >
-                    Proceed to Checkout
-                  </button>
-                </div>
+                <p className="text-lg sm:text-xl md:text-2xl font-semibold">
+                  Subtotal: ₹ {total}
+                </p>
+                <button
+                  onClick={handlePayment}
+                  className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg"
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center h-full">

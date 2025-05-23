@@ -176,5 +176,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { reset, clearError, resetCartUpdated, clearSuccess } = authSlice.actions;
+export const { reset, clearError, resetCartUpdated, clearSuccess} = authSlice.actions;
 export default authSlice.reducer;

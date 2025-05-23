@@ -12,16 +12,16 @@ export interface cartData {
 export interface emailData { 
   name: string;
   email: string;
-  transactionId: string;
+  transactionId: TransactionIdFormat;
   cartdata: NumberRecord;
   address: AddressFormat;
 }
 
 export type AddressFormat ={
-  address: string,
   city: string,
+  street: string,
   state: string,
-  zipCode: string,
+  pincode: string,
   country: string,
 }
 export interface perfumeUpdateDataFormat {
@@ -98,6 +98,10 @@ export type cartDataProps = {
   cart: NumberRecord;
   total: number;
 };
+
+export type TransactionIdFormat = {
+  transactionId: string
+}
 
 export const defaultUser = {
     id: "",

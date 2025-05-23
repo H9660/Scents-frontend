@@ -9,10 +9,14 @@ const nextConfig = {
         source: "/api/:path*",
         destination: `${API_URL}api/:path*`,
       },
-      {
+      { 
         source: "/sendemail",
         destination: "/api/emails/send",
       },
+      {
+        source: "/users/:username /orders",
+        destination: "/users/orders"
+      }
     ];
   },
   async redirects() {
