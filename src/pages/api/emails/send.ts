@@ -3,7 +3,7 @@ import { Resend } from "resend";
 import dotenv from "dotenv";
 import { NextApiRequest, NextApiResponse } from "next";
 dotenv.config();
-const resend = new Resend("re_XJrUCEBs_9EYuCG1tuxECNP5Xc1Xw68U2");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(
   req: NextApiRequest,
