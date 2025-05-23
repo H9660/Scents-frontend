@@ -35,11 +35,11 @@ export default function Shoppingpage({ perfumesData = [] }) {
     if (message === "Authentication token is missing")
       toast.error("Please login.");
     else if (message !== "") toast.error(message);
-  }, [cartUpdated, message]);
+  }, [cartUpdated, message, dispatch]);
 
   useEffect(() => {
     dispatch(setAvailablePerfumes(perfumesData));
-  }, [perfumesData]);
+  }, [perfumesData, dispatch]);
 
   return (
     <>

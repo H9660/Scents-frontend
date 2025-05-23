@@ -41,7 +41,7 @@ export default function CheckoutPage() {
   useEffect(() => {
     if(!isLoggedin)
       router.push("/home");
-  }, [isLoggedin]);
+  }, [isLoggedin, router]);
 
   const getCart = async () => {
     try {
@@ -111,16 +111,15 @@ export default function CheckoutPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: 100,
+        amount: data.price * 100,
         userId: user?.id,
       }),
     });
-    
 
     const { order } = await res.json();
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: 100,
+      amount: order.amount,
       currency: "INR",
       name: "Scentdazzle",
       description: `Payment from ${user?.id}: ${data?.price}`,
@@ -163,12 +162,10 @@ export default function CheckoutPage() {
           address: sendData
         });
         
-        console.log(transxnId)
-
         const emaildata = {
           name: name,
           email: email,
-          transactionId: (transxnId as any).transactionId,
+          transactionId: transxnId,
           cartdata: data,
           address: sendData,
         };

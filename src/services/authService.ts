@@ -14,7 +14,7 @@ const login = async (loginData: userDataFormat) => {
     localStorage.setItem("savedUser", JSON.stringify(response.data));
     return response.data;
 
-};
+};  
 
 
 const register = async (registerData: userDataFormat) => {

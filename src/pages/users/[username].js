@@ -7,7 +7,6 @@ import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 const getUser = async (id) => {
   if (!id) return;
   const response = await axios.get(`/api/users/getOrders?${id}`, {
@@ -40,7 +39,7 @@ export default function UserAccount() {
       router.push("/home");
       return;
     }
-  }, [isLoggedin]);
+  }, [isLoggedin, router]);
   
   const { data, error, isLoading } = useSWR(
     curruser?.id ? "myorders" : {},

@@ -5,12 +5,12 @@ import { UserIcon } from "@heroicons/react/24/outline";
 import { logout, setisLoggedin } from "@/slices/authSlice";
 import { User, defaultUser } from "@/types";
 import { useSelector } from "react-redux";
-import { RootState } from "@/slices/store"; 
+import { RootState } from "@/slices/store";
 export default function ProfileButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const {isLoggedin} = useSelector((state:RootState)=>state.auth)
+  const { isLoggedin } = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
   useEffect(() => {
@@ -25,13 +25,6 @@ export default function ProfileButton() {
     };
   }, []);
 
-  useEffect(() => {
-    const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-    if (currUser) {
-      dispatch(setisLoggedin())
-      setUser(currUser);}
-  }, []);
-
   const handleButtonClick = () => {
     if (isLoggedin) {
       setIsOpen(!isOpen);
@@ -42,10 +35,7 @@ export default function ProfileButton() {
 
   return (
     <div className="relative inline-block text-center" ref={dropdownRef}>
-      <button
-        onClick={handleButtonClick}
-        className="relative group text-white"
-      >
+      <button onClick={handleButtonClick} className="relative group text-white">
         <span className="relative">
           {isLoggedin ? <UserIcon className="size-6" /> : "Login"}
         </span>
@@ -57,8 +47,17 @@ export default function ProfileButton() {
           <div className="py-1">
             <button
               onClick={() => {
-                router.push(`/users/${user.name}`);
-                setIsOpen(false);
+                if (user) {
+                  let savedUser = null
+                  if (user.name === "") {
+                    savedUser = JSON.parse(
+                      localStorage.getItem("savedUser") || ""
+                    );
+                    setUser(savedUser);
+                  }
+                  router.push(`/users/${savedUser.name}`);
+                  setIsOpen(false);
+                }
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
@@ -76,7 +75,7 @@ export default function ProfileButton() {
             <button
               onClick={() => {
                 dispatch(logout());
-                setUser(null as any)
+                setUser(defaultUser);
                 setIsOpen(false);
               }}
               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-100"

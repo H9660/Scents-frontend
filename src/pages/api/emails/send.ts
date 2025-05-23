@@ -11,11 +11,6 @@ export default async function handler(
 ) {
   const { name, email, transactionId, cartdata, address } = req.body;
   console.log("From send")
-  console.log(name)
-  console.log(email)
-  console.log(transactionId)
-  console.log(cartdata)
-  console.log(address)
   try {
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",

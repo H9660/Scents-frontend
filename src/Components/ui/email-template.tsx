@@ -56,7 +56,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
             style={{ fontSize: "16px", color: "#333333", marginBottom: "20px" }}
           >
             We’ve received your order (Transaction ID:{" "}
-            <strong>{transactionId}</strong>) associated with{" "}
+            <strong>{transactionId.transactionId}</strong>) associated with{" "}
             <strong>{email}</strong>. Below are the details of your purchase:
           </p>
 
@@ -146,7 +146,7 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
                 margin: 0,
               }}
             >
-              Total: ₹ {cartdata.price as any}
+              Total: ₹ {cartdata.price.toString()}
             </p>
           </div>
         </div>
