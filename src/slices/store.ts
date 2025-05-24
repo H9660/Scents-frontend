@@ -10,6 +10,8 @@ export const store = configureStore({
     perfumes: perfumeReducer,
     auth: authReducer,  // So we are referring to the authSlice.reducer here   // This has a function will we reset the states like isloading is error etc
   }, 
+
+  devTools: process.env.NODE_ENV !== 'production',
 })
 
 export type AppDispatch = typeof store.dispatch

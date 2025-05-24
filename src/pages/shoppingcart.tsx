@@ -5,7 +5,7 @@ import PaymentButton from "@/Components/PaymentButton";
 import { FiAlertCircle } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Spinner } from "@/Components/ui/spinner";
+import { Loader2 } from "lucide-react";
 import { User } from "@/types";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -75,7 +75,11 @@ export default function CheckoutPage() {
     setUser(savedUser as User);
   }, [router]);
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return (
+    <div className="flex justify-center items-center h-screen">
+      <Loader2 className="animate-spin text-white-400 w-16 h-16 animate-[spin_0.4s_linear_infinite]" />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-transparent flex items-center justify-center p-2 sm:p-4 md:p-6 font-roboto">

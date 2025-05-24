@@ -47,15 +47,19 @@ export default function ProfileButton() {
           <div className="py-1">
             <button
               onClick={() => {
+              
                 if (user) {
-                  let savedUser = defaultUser;
+                  console.log("I am in")
+                  let savedUser = user;
                   if (user.name === "") {
                     savedUser = JSON.parse(
                       localStorage.getItem("savedUser") || ""
                     );
                     setUser(savedUser!);
                   }
+                  console.log(savedUser)
                   if (savedUser?.name) {
+                    console.log("done")
                     router.push(`/users/${savedUser.name}`);
                     setIsOpen(false);
                   }

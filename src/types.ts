@@ -1,7 +1,26 @@
+import { LuType } from "react-icons/lu";
+
 export interface userDataFormat {
   userPhone: string;
   userName?: string;
-  userPassword?: string
+  userPassword?: string;
+}
+
+export interface RazorpayOrder {
+  order: {
+    amount: number; // e.g., 400000 (in paise)
+    amount_due: number; // e.g., 400000
+    amount_paid: number; // e.g., 0
+    attempts: number; // e.g., 0
+    created_at: number; // e.g., 1748075235 (Unix timestamp)
+    currency: string; // e.g., "INR"
+    entity: "order";
+    id: string; // e.g., "order_QYhS2X5DHRLFr7"
+    notes: Record<string, string>; // Empty or key-value notes
+    offer_id: string | null;
+    receipt: string | null;
+    status: "created" | "paid" | "attempted";
+  };
 }
 
 export interface cartData {
@@ -9,7 +28,7 @@ export interface cartData {
   cart: Record<string, number>;
 }
 
-export interface emailData { 
+export interface emailData {
   name: string;
   email: string;
   transactionId: TransactionIdFormat;
@@ -17,13 +36,13 @@ export interface emailData {
   address: AddressFormat;
 }
 
-export type AddressFormat ={
-  city: string,
-  street: string,
-  state: string,
-  pincode: string,
-  country: string,
-}
+export type AddressFormat = {
+  city: string;
+  street: string;
+  state: string;
+  pincode: string;
+  country: string;
+};
 export interface perfumeUpdateDataFormat {
   name: string;
   price?: number;
@@ -36,8 +55,8 @@ export type User = {
   id: string;
   name: string;
   phone: string;
-  createdAt: string; 
-  updatedAt?: string; 
+  createdAt: string;
+  updatedAt?: string;
   token?: string;
 };
 
@@ -49,7 +68,7 @@ export type perfumeData = {
 };
 
 export type paymentResponse = {
-    success: string;
+  success: string;
 };
 
 interface RazorpaySuccessResponse {
@@ -65,7 +84,7 @@ export interface RazorpayOptions {
   name: string;
   description: string;
   order_id: string;
-  handler: (response: RazorpaySuccessResponse) => void
+  handler: (response: RazorpaySuccessResponse) => void;
   prefill?: {
     name: string;
     contact: string;
@@ -77,19 +96,32 @@ export interface RazorpayOptions {
 
 export interface RazorpayInstance {
   open(): void;
-  on(event: 'payment.failed', callback: (response: { error: string }) => void): void;
+  on(
+    event: "payment.failed",
+    callback: (response: { error: string }) => void
+  ): void;
 }
 
 export interface paymentResponsePayload {
   success: boolean;
 }
 
+export type paymentData = {
+  userId: string;
+  amount: number;
+};
+
+export type verifyData = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
 export interface paymentApiResponse {
   payload?: paymentResponsePayload; // Mark `payload` as optional
 }
 
 export type cartItemFormat = {
-  imageUrl: string,
+  imageUrl: string;
   price: number;
   quantity: number;
 };
@@ -100,15 +132,15 @@ export type cartDataProps = {
 };
 
 export type TransactionIdFormat = {
-  transactionId: string
-}
+  transactionId: string;
+};
 
 export const defaultUser = {
-    id: "",
-    name: "",
-    phone: "",
-    createdAt: "",
-    updatedAt: "",
-    address: "",
-    totalCartprice: 0,
-}
+  id: "",
+  name: "",
+  phone: "",
+  createdAt: "",
+  updatedAt: "",
+  address: "",
+  totalCartprice: 0,
+};

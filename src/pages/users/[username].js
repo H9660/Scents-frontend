@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import useSWR from "swr";
-import { Spinner } from "@/Components/ui/spinner";
 import { defaultUser } from "@/types";
 import { logout } from "@/slices/authSlice";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/Components/ui/spinner";
 const getUser = async (id) => {
   if (!id) return;
   const response = await axios.get(`/api/users/getOrders?${id}`, {
@@ -48,7 +48,8 @@ export default function UserAccount() {
   );
   console.log(data);
   if (error) return <div className="text-white">Failed to load user data.</div>;
-  if (isLoadingUser || isLoading) return <Spinner />;
+  if(isLoading || isLoadingUser)
+  return <Spinner/>
 
   return (
     <div className="text-white flex justify-center items-center min-h-screen p-6">
