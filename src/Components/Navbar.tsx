@@ -7,7 +7,7 @@ import {
   Heading,
   Button,
   VStack,
-  Separator,
+  Separator
 } from "@chakra-ui/react";
 import ProfileButton from "./ui/profileButton.tsx";
 import SearchBar from "./ui/searchbar.tsx";
@@ -39,11 +39,11 @@ const Navbar = () => {
   ];
 
   const router = useRouter();
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const navigate = (url: string) => {
     router.push(url);
   };
-  
+
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
@@ -51,19 +51,28 @@ const Navbar = () => {
 
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-    if (currUser){
-      dispatch(setisLoggedin())
-      setUser(currUser);}
+    if (currUser) {
+      dispatch(setisLoggedin());
+      setUser(currUser);
+    }
   }, [dispatch]);
 
   useEffect(() => {
-    const handleResize = () => {
-      setSmall(window.innerWidth < 800);
+    const mediaQuery = window.matchMedia("(max-width: 799px)");
+  
+    const handleChange = (e: MediaQueryListEvent) => {
+      setSmall(e.matches);
     };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize); // Cleanup on unmount
+  
+    // Set initial value
+    setSmall(mediaQuery.matches);
+  
+    // Listen for changes
+    mediaQuery.addEventListener("change", handleChange);
+  
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
   }, []);
 
   return (
@@ -98,17 +107,17 @@ const Navbar = () => {
             </Heading>
           </Box>
 
+          <Box
+            marginLeft="103px"
+            flex="1"
+            display="flex"
+            justifyContent="center"
+          >
+            <SearchBar />
+          </Box>
+
           {!small && (
             <>
-              <Box
-                marginLeft="103px"
-                flex="1"
-                display="flex"
-                justifyContent="center"
-              >
-                <SearchBar small={small} />
-              </Box>
-
               <Box
                 display={{ base: "none", md: "flex" }}
                 gap={10}
@@ -135,10 +144,7 @@ const Navbar = () => {
               <DrawerRoot>
                 <DrawerBackdrop />
                 <DrawerTrigger>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                  >
+                  <Button variant="outline" size="sm">
                     <Box
                       opacity={isVisible ? 1 : 0}
                       transition="opacity 0.2s ease-in"
@@ -163,7 +169,6 @@ const Navbar = () => {
                           <Button
                             key={link.url}
                             onClick={() => {
-                              setSmall(false);
                               navigate(link.url);
                             }}
                             w="full"
@@ -182,7 +187,6 @@ const Navbar = () => {
                       <Button
                         key={user?.name}
                         onClick={() => {
-                          setSmall(false);
                           if (user?.name) navigate(`/users/${user?.name}`);
                           else navigate("/login");
                         }}

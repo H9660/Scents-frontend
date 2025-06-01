@@ -44,24 +44,24 @@ export default function PaymentButton({
       toast.error("User ID or total missing");
       return;
     }
-    
-    let res
+
+    let res;
     setPaymentLoading(true);
-    try{
-    res = await fetch(`api/payment/makePayment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: data.price * 100 ,
-        userId: user.id,
-      }),
-    });
-    console.log(res)
-  }catch(error){
-    toast.error(error)
-    setPaymentLoading(false)
-    return
-  }
+    try {
+      res = await fetch(`api/payment/makePayment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: data.price * 100,
+          userId: user.id,
+        }),
+      });
+      console.log(res);
+    } catch (error) {
+      toast.error(error);
+      setPaymentLoading(false);
+      return;
+    }
     const { order } = await res.json();
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -100,7 +100,7 @@ export default function PaymentButton({
 
         const { name, email, ...sendData } = formData;
         console.log(formData);
-        
+
         const transxnId = await createTransaction({
           userId: user?.id,
           razorpay_payment_id: response.razorpay_payment_id,
@@ -159,16 +159,18 @@ export default function PaymentButton({
         Subtotal: ₹ {total}
       </p>
       <button
-  onClick={handlePayment}
-  className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg flex justify-center items-center"
->
-  {paymentLoading ? (
-    <Loader2 className="animate-spin text-black dark:text-white h-6 w-6" style={{ animationDuration: "500ms" }} />
-  ) : (
-    "Proceed to Checkout"
-  )}
-</button>
-
+        onClick={handlePayment}
+        className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg flex justify-center items-center"
+      >
+        {paymentLoading ? (
+          <Loader2
+            className="animate-spin text-black dark:text-white h-6 w-6"
+            style={{ animationDuration: "500ms" }}
+          />
+        ) : (
+          "Proceed to Checkout"
+        )}
+      </button>
     </div>
   );
 }
