@@ -52,7 +52,7 @@ export default function PaymentButton({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: 100,
+        amount: data.price * 100 ,
         userId: user.id,
       }),
     });
@@ -65,7 +65,7 @@ export default function PaymentButton({
     const { order } = await res.json();
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: data.price * 100,
+      amount: order.amount,
       currency: "INR",
       name: "Scentdazzle",
       description: `Payment from ${user?.id}: ${data?.price}`,
