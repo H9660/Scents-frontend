@@ -55,7 +55,7 @@ const Login: React.FC<props> = ({ name }) => {
       dispatch(clearSuccess());
       router.push("/home");
     }
-  }, [isError, isLoggedin, isSuccess]);
+  }, [isError, isLoggedin, isSuccess, dispatch, message, router]);
 
   const handleClick = async () => {
     if (userPhone.length !== 10) {

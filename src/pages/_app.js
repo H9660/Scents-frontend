@@ -9,6 +9,7 @@ import Navbar from "@/Components/Navbar";
 import { Footer } from "@/Components/Footer";
 import "../app/globals.css";
 import dotenv from "dotenv";
+import { Box, Flex } from "@chakra-ui/react";
 dotenv.config("../.env.local");
 function MyApp({ Component, pageProps }) {
   return (
@@ -16,9 +17,13 @@ function MyApp({ Component, pageProps }) {
       <React.StrictMode>
         <Provider store={store}>
           <ProvideChakra>
+          <Flex direction="column" minH="100vh">
+          <Box as="main" flex="1">
             <Navbar />
             <Component {...pageProps} />
+            </Box>
             <Footer />
+            </Flex>
           </ProvideChakra>
           <ToastContainer />
         </Provider>

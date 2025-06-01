@@ -11,7 +11,7 @@ const nextConfig = {
       },
       { 
         source: "/sendemail",
-        destination: "/api/emails/send",
+        destination: `/api/emails/send`,
       },
       {
         source: "/users/:username /orders",

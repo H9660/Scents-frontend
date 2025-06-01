@@ -1,4 +1,3 @@
-"use client";
 import { createSlice, } from "@reduxjs/toolkit";
 const savedUser =
   typeof window !== "undefined" ? localStorage.getItem("savedUser") : null;

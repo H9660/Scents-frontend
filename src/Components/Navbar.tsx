@@ -15,6 +15,7 @@ import { Bars3Icon, UserIcon } from "@heroicons/react/24/outline";
 import logo from "../images/logo.png";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { setisLoggedin } from "@/slices/authSlice.ts";
 import {
   DrawerActionTrigger,
   DrawerBackdrop,
@@ -27,6 +28,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/Components/ui/drawer";
+import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
@@ -37,11 +39,11 @@ const Navbar = () => {
   ];
 
   const router = useRouter();
-
+  const dispatch = useAppDispatch()
   const navigate = (url: string) => {
     router.push(url);
   };
-
+  
   useEffect(() => {
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
@@ -49,8 +51,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const currUser = JSON.parse(localStorage.getItem("savedUser") || "null");
-    if (currUser) setUser(currUser);
-  }, []);
+    if (currUser){
+      dispatch(setisLoggedin())
+      setUser(currUser);}
+  }, [dispatch]);
 
   useEffect(() => {
     const handleResize = () => {

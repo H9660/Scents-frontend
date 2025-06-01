@@ -123,6 +123,7 @@ export default function Shoppingpage({ perfumesData = [] }) {
                         router.push("/login");
                         return;
                       }
+
                       await dispatch(
                         addToCart({
                           userId: (user as User).id,

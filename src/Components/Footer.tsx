@@ -1,4 +1,3 @@
-"use client";
 import {
   Box,
   Container,
@@ -6,28 +5,35 @@ import {
   Text,
   Link,
   VStack,
-  HStack,
   Separator,
 } from "@chakra-ui/react";
 export function Footer() {
   return (
-    <Box marginTop="2rem" as="footer" bg="gray.900" color="gray.400" py={10} px={6} fontFamily="Sirin Stencil">
+    <Box
+      marginTop="2rem"
+      as="footer"
+      bg="gray.900"
+      color="gray.400"
+      py={10}
+      px={6}
+      fontFamily="Sirin Stencil"
+    >
       <Container maxW="container.xl">
-        <Flex
-          direction="row"
-          justify="space-between"
-          gap={10}
-        >
-          
+        <Flex direction="row" justify="space-between" gap={10}>
           {/* Branding & Description */}
           <VStack align="start" spaceY={3}>
-          
-            <Text fontSize="3xl" fontWeight="bold" color="white" fontFamily="Great Vibes">
-           Scentdazzle
+            <Text
+              fontSize="3xl"
+              fontWeight="bold"
+              color="white"
+              fontFamily="Great Vibes"
+            >
+              Scentdazzle
             </Text>
-            <Text fontSize={{base: "sm", md:"2xl"}}>
-            Experience captivating scents crafted to enchant your senses.
-Discover fragrances that leave a lasting impression with every spritz.
+            <Text fontSize={{ base: "sm", md: "2xl" }}>
+              Experience captivating scents crafted to enchant your senses.
+              Discover fragrances that leave a lasting impression with every
+              spritz.
             </Text>
           </VStack>
 
@@ -54,23 +60,14 @@ Discover fragrances that leave a lasting impression with every spritz.
           </VStack>
         </Flex>
 
-        <Separator margin="1rem" width="100%" variant="dotted" borderColor="gray" borderWidth="0.1px" />
-        <Flex
-          justify="space-between"
-          direction={{ base: "column", md: "row" }}
-          align="center"
-          fontSize="xl"
-        >
-          <Text>&copy; 2025 Scentdazzle. All rights reserved.</Text>
-          <HStack spaceX={4}>
-            <Link href="#" _hover={{ color: "white" }}>
-              Privacy Policy
-            </Link>
-            <Link href="#" _hover={{ color: "white" }}>
-              Terms of Service
-            </Link>
-          </HStack>
-        </Flex>
+        <Separator
+          margin="1rem"
+          width="100%"
+          variant="dotted"
+          borderColor="gray"
+          borderWidth="0.1px"
+        />
+          <Text fontSize="2xl" textAlign="center">&copy; 2025 Scentdazzle. All rights reserved.</Text>
       </Container>
     </Box>
   );
