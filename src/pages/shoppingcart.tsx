@@ -6,6 +6,7 @@ import { FiAlertCircle } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { toast } from "react-toastify"; 
 import { User } from "@/types";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -34,10 +35,16 @@ export default function CheckoutPage() {
   });
   const router = useRouter();
   const { isLoggedin } = useSelector((state: RootState) => state.auth);
+  const { isEmailSent} = useSelector((state: RootState)=> state.email)
   useEffect(() => {
     if (!isLoggedin) router.push("/home");
   }, [isLoggedin, router]);
-
+  
+  useEffect(()=>{
+   if(isEmailSent)
+   toast.success("Email sent successfully!")
+  }, [isEmailSent])
+  
   const getCart = async () => {
     try {
       const savedUser = JSON.parse(localStorage.getItem("savedUser") || "null");

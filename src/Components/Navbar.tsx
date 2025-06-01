@@ -54,7 +54,7 @@ const Navbar = () => {
     if (currUser){
       dispatch(setisLoggedin())
       setUser(currUser);}
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const handleResize = () => {

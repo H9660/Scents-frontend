@@ -6,6 +6,7 @@ export const createTransaction = async(data)=>{
   });
   
   transactionID = await transactionID.json();
+  console.log(transactionID)
   return transactionID
 
 }

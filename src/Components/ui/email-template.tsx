@@ -19,7 +19,6 @@ export const EmailTemplate: React.FC<Readonly<emailData>> = ({
           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {/* Header */}
         <div
           style={{
             backgroundColor: "#1a1a1a",

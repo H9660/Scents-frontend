@@ -8,12 +8,12 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@/Components/ui/spinner";
-const getUser = async (id) => {
+
+const getUserOrders = async (id) => {
   if (!id) return;
   const response = await axios.get(`/api/users/getOrders?${id}`, {
     withCredentials: true,
   });
-  console.log(response);
   return response;
 };
 
@@ -26,104 +26,84 @@ export default function UserAccount() {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const dispatch = useAppDispatch();
   const { isLoggedin } = useSelector((state) => state.auth);
+
   useEffect(() => {
     const userStr = localStorage.getItem("savedUser");
     const addressStr = localStorage.getItem("address");
-
     if (userStr) setcurrUser(JSON.parse(userStr));
     if (addressStr) setAddress(JSON.parse(addressStr));
     setIsLoadingUser(false);
   }, []);
 
   useEffect(() => {
-    if (!isLoggedin) {
-      router.push("/home");
-      return;
-    }
+    if (!isLoggedin) router.push("/home");
   }, [isLoggedin, router]);
-  
+
   const { data, error, isLoading } = useSWR(
-    curruser?.id ? "myorders" : {},
-    () => getUser(curruser.id)
+    curruser?.id ? "myorders" : null,
+    () => getUserOrders(curruser.id)
   );
-  console.log(data);
+
   if (error) return <div className="text-white">Failed to load user data.</div>;
-  if(isLoading || isLoadingUser)
-  return <Spinner/>
+  if (isLoading || isLoadingUser) return <Spinner />;
 
   return (
-    <div className="text-white flex justify-center items-center min-h-screen p-6">
-      <div className="bg-gray-800 p-6 rounded-3xl w-full max-w-4xl max-h-5xl h-[900px] shadow-lg flex flex-col sm:flex-row">
-        <div className="sm:w-1/3 border-b sm:border-b-0 sm:border-r border-gray-600 pr-4 mb-4 sm:mb-0 sm:flex sm:flex-col">
+    <div className="min-h-[50vh] bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-white flex justify-center items-start py-10 px-4">
+      <div className="bg-gray-800 p-4 sm:p-6 rounded-3xl w-full max-w-6xl shadow-lg flex flex-col sm:flex-row gap-6">
+        {/* Sidebar */}
+        <div className="sm:w-1/4 flex flex-col gap-2">
           <button
-            className={`w-full text-center py-2 px-4 rounded-lg ${
-              activeTab === "details" ? "bg-blue-600" : "hover:bg-gray-700"
-            }`}
             onClick={() => setActiveTab("details")}
+            className={`transition-all text-sm font-medium py-2 px-4 rounded-xl ${
+              activeTab === "details"
+                ? "bg-blue-500 text-white shadow-md"
+                : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+            }`}
           >
             Personal Details
           </button>
           <button
-            className={`w-full text-center py-2 px-4 rounded-lg mt-2 mb-2 ${
-              activeTab === "orders" ? "bg-blue-600" : "hover:bg-gray-700"
-            }`}
             onClick={() => setActiveTab("orders")}
+            className={`transition-all text-sm font-medium py-2 px-4 rounded-xl ${
+              activeTab === "orders"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 hover:bg-gray-600 text-gray-300"
+            }`}
           >
             My Orders
           </button>
           <button
-            className="w-full text-center py-2 px-4 mt-4 rounded-lg bg-red-600 hover:bg-red-700"
             onClick={() => {
               dispatch(logout());
               window.location.href = "/";
             }}
+            className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-xl mt-4"
           >
             Logout
           </button>
         </div>
 
-        <div className="sm:w-2/3 pl-0 sm:pl-4">
+        {/* Content */}
+        <div className="flex-1">
           {activeTab === "details" && (
-            <div className="mt-6 space-y-4 text-gray-300">
-              <div>
-                <strong>Username:</strong>{" "}
-                <span className="ml-2">{curruser.name}</span>
-              </div>
-
-              <div>
-                <strong>Phone:</strong>{" "}
-                <span className="ml-2">{curruser.phone}</span>
-              </div>
-
-              <div>
-                <strong>Address:</strong>{" "}
-                <span className="ml-2">{address.address}</span>
-              </div>
-
+            <div className="space-y-4 text-gray-300">
+              <div><strong>Username:</strong> <span className="ml-2">{curruser.name}</span></div>
+              <div><strong>Phone:</strong> <span className="ml-2">{curruser.phone}</span></div>
+              <div><strong>Address:</strong> <span className="ml-2">{address.address}</span></div>
               <div>
                 <strong>Account Created:</strong>{" "}
                 <span className="ml-2">
                   {new Date(curruser.createdAt).toLocaleDateString()}
                 </span>
               </div>
-
               <div>
                 <strong>Orders Placed:</strong>{" "}
                 <span className="ml-2 text-green-400">
                   {data ? data.data.orders.length : 0}
                 </span>
               </div>
-
               <button
                 className="mt-2 bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded-lg"
-                onClick={() =>
-                  alert("Redirect to password reset page or open modal")
-                }
-              >
-                Change Password
-              </button>
-              <button
-                className="ml-2 mt-2 bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded-lg"
                 onClick={() => setShowModal(true)}
               >
                 Edit details
@@ -131,6 +111,7 @@ export default function UserAccount() {
             </div>
           )}
 
+          {/* Edit Modal */}
           {showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
               <div className="bg-gray-800 p-6 rounded-2xl w-full max-w-md">
@@ -165,7 +146,6 @@ export default function UserAccount() {
                       setAddress({ ...address, zip: e.target.value })
                     }
                   />
-
                   <div className="flex justify-end gap-2 mt-4">
                     <button
                       onClick={() => setShowModal(false)}
@@ -192,32 +172,75 @@ export default function UserAccount() {
             </div>
           )}
 
+          {/* Orders */}
           {activeTab === "orders" && (
             <div>
               <h2 className="text-xl font-semibold mb-4">Your Orders</h2>
               {data.data.orders.length === 0 ? (
                 <p className="text-gray-400">No orders yet.</p>
               ) : (
-                <div className="max-h-64 overflow-y-auto rounded-lg">
-                  <table className="w-full border-collapse border border-gray-700 rounded-lg">
-                    <thead>
-                      <tr className="bg-gray-700 text-white">
-                        <th className="border border-gray-600 p-2">
-                          Transaction ID
-                        </th>
-                        <th className="border border-gray-600 p-2">Subtotal</th>
+                <div className="relative overflow-x-auto max-h-[600px] rounded-lg border border-gray-600">
+                  <table className="w-full text-sm text-center text-white">
+                    <thead className="bg-gray-700 text-white">
+                      <tr>
+                        <th className="p-2 border border-gray-600">Transaction</th>
+                        <th className="p-2 border border-gray-600">Order Details</th>
+                        <th className="p-2 border border-gray-600">Subtotal</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-700">
                       {data.data.orders.map((order) => (
-                        <tr
-                          key={order.transactions_id}
-                          className="text-center bg-gray-800"
-                        >
-                          <td className="border border-gray-600 p-2">
-                            {order.transactions_id}
+                        <tr key={order.transactionId}>
+                          <td className="p-2 border border-gray-600 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="font-mono">
+                                {order.transactionId.slice(0, 6)}...
+                              </span>
+                              <button
+                                className="bg-gray-700 hover:bg-gray-600 px-2 py-1 text-xs rounded"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(order.transactionId);
+                                  alert("Transaction ID copied!");
+                                }}
+                              >
+                                Copy
+                              </button>
+                            </div>
                           </td>
-                          <td className="border border-gray-600 p-2">
+                          <td className="p-2 border border-gray-600">
+                            <table className="w-full text-xs">
+                              <thead className="bg-gray-800">
+                                <tr>
+                                  <th className="p-1 border border-gray-600">Product</th>
+                                  <th className="p-1 border border-gray-600">Qty</th>
+                                  <th className="p-1 border border-gray-600">Price</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {Object.entries(order.orderDetails.cart).map(
+                                  ([name, item]) => (
+                                    <tr key={name}>
+                                      <td className="p-1 border border-gray-700 flex items-center gap-2">
+                                        <img
+                                          src={item.imageUrl}
+                                          alt={name}
+                                          className="w-6 h-6 rounded object-cover"
+                                        />
+                                        {name}
+                                      </td>
+                                      <td className="p-1 border border-gray-700 text-center">
+                                        {item.quantity}
+                                      </td>
+                                      <td className="p-1 border border-gray-700 text-center">
+                                        ₹{item.price}
+                                      </td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </td>
+                          <td className="p-2 border border-gray-600 text-center">
                             ₹{order.subtotal}
                           </td>
                         </tr>

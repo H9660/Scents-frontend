@@ -1,5 +1,3 @@
-import { LuType } from "react-icons/lu";
-
 export interface userDataFormat {
   userPhone: string;
   userName?: string;

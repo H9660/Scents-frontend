@@ -12,10 +12,8 @@ import {
   Button,
   VStack,
   Flex,
-  Portal,
-  Select,
-  createListCollection,
 } from "@chakra-ui/react";
+import { toast } from "react-toastify";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { User } from "@/types.ts";
@@ -26,18 +24,20 @@ export default function PerfumeContext() {
   const [user, setUser] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const { currPerfume } = useSelector((state: RootState) => state.perfumes);
-  const quantities = createListCollection({
-    items: [
-      { label: "SMALL", value: "5ml" },
-      { label: "MEDIUM", value: "10ml" },
-      { label: "LARGE", value: "15ml" },
-    ],
-  });
+  const {cartUpdated}  = useSelector((state: RootState)=> state.auth)
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("savedUser") || "null");
     setUser(user);
   }, []);
+  
+  useEffect(()=>{
+    if(cartUpdated)
+    {
+      toast.success("Added to cart successfully!")
+      dispatch(resetCartUpdated())
+    }
+  }, [cartUpdated,dispatch])
 
   const addtoCart = async () => {
     if (!user) {
@@ -127,42 +127,10 @@ export default function PerfumeContext() {
               {currPerfume.discription}
             </Text>
             <Text fontSize="xl" fontWeight="bold">
-              ₹ {currPerfume.price}
+              ₹ {currPerfume.price} (5 ml)
             </Text>
 
-            {/* Quantity selector + buttons */}
             <Flex gap={4} w="full" flexWrap={{ base: "wrap", md: "nowrap" }}>
-              <Select.Root
-                collection={quantities}
-                size="sm"
-                width="150px"
-                border="1px solid white"
-              >
-                <Select.HiddenSelect />
-                <Select.Control>
-                  <Select.Trigger>
-                    <Select.ValueText
-                      placeholder="Select quantity"
-                      paddingLeft="1rem"
-                    />
-                  </Select.Trigger>
-                  <Select.IndicatorGroup>
-                    <Select.Indicator />
-                  </Select.IndicatorGroup>
-                </Select.Control>
-                <Portal>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {quantities.items.map((quantity) => (
-                        <Select.Item item={quantity} key={quantity.value}>
-                          {quantity.label}{" ("}{quantity.value}{")"}
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Portal>
-              </Select.Root>
               <Button
                 variant="outline"
                 colorScheme="whiteAlpha"

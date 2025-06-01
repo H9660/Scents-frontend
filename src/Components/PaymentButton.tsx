@@ -5,8 +5,6 @@ import { useRouter } from "next/router";
 import { Loader2 } from "lucide-react";
 import { createTransaction } from "@/utils/paymentUtil";
 import { toast } from "react-toastify";
-import { logout } from "@/slices/authSlice";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
 export default function PaymentButton({
   formData,
   setErrors,
@@ -15,7 +13,6 @@ export default function PaymentButton({
   total,
 }) {
   const router = useRouter();
-  const dispatch = useAppDispatch()
   const [paymentLoading, setPaymentLoading] = useState(false);
   useEffect(() => {
     const script = document.createElement("script");
@@ -47,7 +44,7 @@ export default function PaymentButton({
       toast.error("User ID or total missing");
       return;
     }
-
+    
     let res
     setPaymentLoading(true);
     try{
@@ -55,18 +52,20 @@ export default function PaymentButton({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: data.price * 100,
+        amount: 100,
         userId: user.id,
       }),
     });
+    console.log(res)
   }catch(error){
     toast.error(error)
+    setPaymentLoading(false)
     return
   }
     const { order } = await res.json();
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: order.amount,
+      amount: 100,
       currency: "INR",
       name: "Scentdazzle",
       description: `Payment from ${user?.id}: ${data?.price}`,
@@ -160,15 +159,16 @@ export default function PaymentButton({
         Subtotal: ₹ {total}
       </p>
       <button
-        onClick={handlePayment}
-        className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg"
-      >
-        {paymentLoading ? (
-          <Loader2 className="animate-spin light:text-black-400 dark:text-white-400" />
-        ) : (
-          "Proceed to Checkout"
-        )}
-      </button>
+  onClick={handlePayment}
+  className="mt-3 sm:mt-4 md:mt-6 w-full bg-yellow-500 text-black px-4 sm:px-6 md:px-8 py-2 sm:py-3 md:py-4 rounded-md hover:bg-yellow-600 transition-colors duration-200 font-semibold text-sm sm:text-base md:text-lg flex justify-center items-center"
+>
+  {paymentLoading ? (
+    <Loader2 className="animate-spin text-black dark:text-white h-6 w-6" style={{ animationDuration: "500ms" }} />
+  ) : (
+    "Proceed to Checkout"
+  )}
+</button>
+
     </div>
   );
 }

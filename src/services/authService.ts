@@ -1,15 +1,14 @@
-import axios from "axios";
 import { userDataFormat } from "../types.ts";
 import { cartData } from "../types.ts";
-const USER_URL = "/api/users/";
-
+import axios from "axios"
+const API_URL = "api/users/";
 const login = async (loginData: userDataFormat) => {
     const userloginData = {
       phone: loginData.userPhone,
       password: loginData.userPassword,
     };
 
-    const response = await axios.post(USER_URL + "login", userloginData, { withCredentials: true });
+    const response = await axios.post(API_URL + "login", userloginData);
     console.log(response);
     localStorage.setItem("savedUser", JSON.stringify(response.data));
     return response.data;
@@ -26,8 +25,8 @@ const register = async (registerData: userDataFormat) => {
 
     const { password, ...safeData } = userRegisterData;
     localStorage.setItem("savedUser", JSON.stringify(safeData));
-    console.log(password)
-    const response = await axios.post(USER_URL + "register", userRegisterData, {withCredentials: true});
+    console.log(password) 
+    const response = await axios.post(API_URL + "register", safeData);
     return response.data;
 };
 
@@ -41,12 +40,12 @@ const addtoCart = async (data: cartData) => {
       userId: data.userId,
       cart: data.cart,
     };
-    const response = await axios.patch(USER_URL + "updatecart", userCart);
+    const response = await axios.patch(API_URL + "updatecart", userCart);
     return response.data;
 };
 
 const getuserCart = async (userId: string) => {
-    const response = await axios.get(USER_URL + "getCart", {
+    const response = await axios.get(API_URL + "getCart", {
       params: {
         userId: userId,
       },
