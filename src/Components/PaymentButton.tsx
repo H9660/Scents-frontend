@@ -65,7 +65,7 @@ export default function PaymentButton({
     const { order } = await res.json();
     const options: RazorpayOptions = {
       key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: 100,
+      amount: data.price * 100,
       currency: "INR",
       name: "Scentdazzle",
       description: `Payment from ${user?.id}: ${data?.price}`,
