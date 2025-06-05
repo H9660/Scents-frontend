@@ -24,8 +24,7 @@ const register = async (registerData: userDataFormat) => {
     };
 
     const { password, ...safeData } = userRegisterData;
-    localStorage.setItem("savedUser", JSON.stringify(safeData));
-    console.log(password) 
+    localStorage.setItem("savedUser", JSON.stringify(userRegisterData));
     const response = await axios.post(API_URL + "register", safeData);
     return response.data;
 };
