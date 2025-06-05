@@ -11,7 +11,7 @@ import { Spinner } from "@/Components/ui/spinner";
 
 const getUserOrders = async (id) => {
   if (!id) return;
-  const response = await axios.get(`/api/users/getOrders?${id}`, {
+  const response = await axios.get(`/api/users/getOrders?userId=${id}`, {
     withCredentials: true,
   });
   return response;
