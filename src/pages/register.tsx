@@ -55,7 +55,10 @@ const Register: React.FC<props> = ({ name }) => {
     }
     dispatch(register(formData));
     if (isError) toast.error(message);
-    else router.push("/login")
+    else {
+      toast.success("You are registered. Please login");
+      router.push("/login");
+    }
   };
 
   const handleClose = () => {
