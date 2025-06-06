@@ -7,6 +7,7 @@ import { ProvideChakra } from "@/Components/ui/provider";
 import { store } from "../slices/store";
 import Navbar from "@/Components/Navbar";
 import { Footer } from "@/Components/Footer";
+import Chatbot from "@/Components/Chatbot";
 import "../app/globals.css";
 import dotenv from "dotenv";
 import { Box, Flex } from "@chakra-ui/react";
@@ -17,12 +18,13 @@ function MyApp({ Component, pageProps }) {
       <React.StrictMode>
         <Provider store={store}>
           <ProvideChakra>
-          <Flex direction="column" minH="100vh">
-          <Box as="main" flex="1">
-            <Navbar />
-            <Component {...pageProps} />
-            </Box>
-            <Footer />
+            <Flex direction="column" minH="100vh">
+              <Box as="main" flex="1">
+                <Navbar />
+                <Component {...pageProps} />
+              </Box>
+              <Chatbot />
+              <Footer />
             </Flex>
           </ProvideChakra>
           <ToastContainer />
