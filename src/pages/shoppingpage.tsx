@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { Button, Image, Grid, Box, Text } from "@chakra-ui/react";
+import { Button, Image, Grid, Box, Text} from "@chakra-ui/react";
 import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { RootState } from "@/slices/store.ts";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
