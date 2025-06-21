@@ -5,6 +5,7 @@ import { CirclePlus, CircleMinus, Loader2 } from "lucide-react";
 import { mutate } from "swr";
 import { Button } from "@chakra-ui/react";
 import Image from "next/image";
+import { resetCartUpdated } from "@/slices/authSlice";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { cartItemFormat, defaultUser, User } from "@/types";
@@ -14,7 +15,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/slices/store";
 export default function Cartdata({ data }) {
   const [user, setUser] = useState<User>(defaultUser);
-  const { isLoading } = useSelector((state: RootState) => state.auth);
+  const { isLoading, cartUpdated } = useSelector(
+    (state: RootState) => state.auth
+  );
   const [currAddCart, setCurrAddCart] = useState("");
   const [currRemCart, setCurrRemCart] = useState("");
   const dispatch = useAppDispatch();
@@ -37,7 +40,7 @@ export default function Cartdata({ data }) {
     let authUser;
     (async () => {
       authUser = await axios.get("/api/users/me", { withCredentials: true });
-      if (authUser.status !== "200") {
+      if (authUser.status == "401") {
         toast.error("Session Expired. Please login.");
         router.push("/login");
         return;
@@ -53,13 +56,19 @@ export default function Cartdata({ data }) {
     setUser(savedUser);
   }, [router]);
 
+  useEffect(() => {
+    if (cartUpdated) {
+      toast.success("Cart updated!");
+      dispatch(resetCartUpdated());
+    }
+  }, [cartUpdated]);
+
   return (
     <>
       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 md:mb-8">
         Your Cart
       </h2>
 
-      {/* Scrollable Cart Items */}
       <ScrollArea className="flex-1 overflow-y-scroll h-[500px]">
         <ul className="divide-y divide-gray-700">
           {Object.entries(data.cart).map(([ele, idx]) => (
