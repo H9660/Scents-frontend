@@ -19,8 +19,11 @@ const getperfume = async (name: string) => {
       },
     });
     if (response.data) return response.data;
-  } catch (err: unknown) {
-     console.log(err)
+  } catch (err) {
+     return {
+      error: err, 
+      message: "Perfume not found."
+     }
   }
 };
 // Get perfumes

@@ -14,32 +14,27 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
 import { addToCart, resetCartUpdated } from "../slices/authSlice.ts";
 import { User } from "@/types.ts";
 import { RootState } from "@/slices/store.ts";
+import { getperfume, setPerfumeLoading } from "@/slices/perfumeSlice.ts";
+import { Spinner } from "@/Components/ui/spinner.tsx";
+import PerfumeNotFound from "@/Components/ui/perfumeNotFound.tsx";
 
-export default function PerfumeContext() {
-  const router = useRouter();
+const PerfumeContext = () => {
   const [user, setUser] = useState<string | null>(null);
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const { currPerfume } = useSelector((state: RootState) => state.perfumes);
-  const {cartUpdated}  = useSelector((state: RootState)=> state.auth)
-
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("savedUser") || "null");
-    setUser(user);
-  }, []);
-  
-  useEffect(()=>{
-    if(cartUpdated)
-    {
-      toast.success("Added to cart successfully!")
-      dispatch(resetCartUpdated())
-    }
-  }, [cartUpdated,dispatch])
-
+  const searchParams = useSearchParams();
+  const name = searchParams!.get('name');
+  const { cartUpdated } = useSelector((state: RootState) => state.auth)
+  const { currPerfume, perfumeLoading} = useSelector((state: RootState) => state.perfumes)
   const addtoCart = async () => {
+    if (!currPerfume)
+      return;
+
     if (!user) {
       router.push("/login");
       return;
@@ -75,8 +70,37 @@ export default function PerfumeContext() {
     );
   };
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("savedUser") || "null");
+    setUser(user);
+  }, []);
+
+  useEffect(() => {
+    if (cartUpdated) {
+      toast.success("Added to cart successfully!")
+      dispatch(resetCartUpdated())
+    }
+  }, [cartUpdated, dispatch])
+
+  useEffect(() => {
+    if (!name)
+      return;
+    dispatch(getperfume(name as string))
+  }, [name])
+
+  useEffect(() => {
+    setPerfumeLoading()
+  }, [])
+
+  if (currPerfume?.message) {
+    return (
+      <PerfumeNotFound/>
+    );
+  }
+
+  console.log(currPerfume)
   return (
-    <Center color="white" py={6} px={4} fontFamily="Sirin Stencil">
+    perfumeLoading ? <Spinner /> : <Center color="white" py={6} px={4} fontFamily="Sirin Stencil">
       <Box
         maxW={{ base: "100%", md: "90%", lg: "70%" }}
         border="1px solid white"
@@ -162,5 +186,7 @@ export default function PerfumeContext() {
         </Grid>
       </Box>
     </Center>
-  );
+  )
 }
+
+export default PerfumeContext

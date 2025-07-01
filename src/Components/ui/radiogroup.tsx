@@ -16,7 +16,7 @@ export const Radiogroup= () => {
           position="relative"
           width="90%"
             color="black"
-            fontFamily="Sirin Stencil"
+            fontFamily="Cinzel, serif"
             label={item.title}
             description={item.description}
             key={item.value}

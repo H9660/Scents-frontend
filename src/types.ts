@@ -4,6 +4,27 @@ export interface userDataFormat {
   userPassword?: string;
 }
 
+enum available{
+  "Yes",
+  "No"
+}
+enum quantity{
+  "SMALL",
+  "MEDIUM",
+  "LARGE"
+}
+export const defaultperfume = {
+  id: "",
+  name: "",
+  price: 500,
+  quantity: quantity.SMALL,
+  imageUrl: "",
+  discription: "",
+  available: available.Yes,
+  message: ""
+};
+
+
 export interface RazorpayOrder {
   order: {
     amount: number; // e.g., 400000 (in paise)
@@ -63,6 +84,14 @@ export type perfumeData = {
   price: number;
   imageUrl: string;
   discription?: string;
+};
+
+
+export type perfumeFormat = perfumeData & {
+  id: string;
+  available: available;
+  quantity: quantity ; // inferred from "MEDIUM"
+  message?: string;
 };
 
 export type paymentResponse = {

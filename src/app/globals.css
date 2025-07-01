@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=GFS+Didot&family=Sirin+Stencil&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Sirin+Stencil&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Sirin Stencil:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Cinzel:wght@400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Sirin Stencil:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Cinzel:wght@400..900&family=Great+Vibes&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Sirin Stencil:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Cinzel, serif:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Cinzel:wght@400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Cinzel, serif:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Cinzel:wght@400..900&family=Great+Vibes&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&family=Cinzel, serif:ital,opsz,wght@0,5..1200,300..900;1,5..1200,300..900&family=Sirin+Stencil&display=swap');
 @import "flowbite/src/themes/default";
 @source "../../node_modules/flowbite";
 @plugin "flowbite/plugin";
@@ -108,7 +108,9 @@ to {
 }
 
 .animated-bg {
-  background: linear-gradient(-45deg, #AA113C 50%, #6C096D, #e69db1);
+  /* background: linear-gradient(-45deg, #AA113C 50%, #6C096D, #e69db1);
+   */
+  background: #F4E7E1;
   background-size: 300% 300%;
   animation: gradientFlow 5s ease infinite;
   min-height: 100vh;

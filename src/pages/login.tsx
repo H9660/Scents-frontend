@@ -107,7 +107,7 @@ const Login: React.FC<props> = ({ name }) => {
           color="white"
           p={6}
           rounded="2xl"
-          fontFamily="Sirin Stencil"
+          fontFamily="Cinzel, serif"
           w={{ base: "90%", md: "500px" }}
           mx="auto"
           border="1px solid"

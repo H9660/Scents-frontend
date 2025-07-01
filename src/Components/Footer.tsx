@@ -16,7 +16,7 @@ export function Footer() {
       color="gray.400"
       py={10}
       px={6}
-      fontFamily="Sirin Stencil"
+      fontFamily="Cinzel, serif"
     >
       <Container maxW="container.xl">
         <Flex direction="row" justify="space-between" gap={10}>
