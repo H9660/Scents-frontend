@@ -39,6 +39,7 @@
     "react-toastify": "^11.0.5",
     "react-tsparticles": "^2.12.2",
     "resend": "^4.2.0",
+    "slick-carousel": "^1.8.1",
     "swr": "^2.3.3",
     "tsparticles": "^3.8.1",
     "twilio": "^5.4.5"
