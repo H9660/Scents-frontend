@@ -29,10 +29,13 @@ import {
   DrawerTrigger,
 } from "@/Components/ui/drawer";
 import { useAppDispatch } from "@/hooks/useAppDispatch.ts";
+import { useSelector } from "react-redux";
+import { RootState } from "@/slices/store.ts";
 const Navbar = () => {
   const [small, setSmall] = useState(false);
   const [user, setUser] = useState<User>(defaultUser);
   const [isVisible, setIsVisible] = useState(false);
+  const { isLoggedin } = useSelector((state: RootState) => state.auth)
   const navUrls = [
     { label: "Home", url: "/home" },
     { label: "Shop", url: "/home" },
@@ -55,21 +58,22 @@ const Navbar = () => {
       dispatch(setisLoggedin());
       setUser(currUser);
     }
-  }, [dispatch]);
+    else setUser(defaultUser)
+  }, [dispatch, isLoggedin]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 799px)");
-  
+    const mediaQuery = window.matchMedia("(max-width: 1230px)");
+
     const handleChange = (e: MediaQueryListEvent) => {
       setSmall(e.matches);
     };
-  
+
     // Set initial value
     setSmall(mediaQuery.matches);
-  
+
     // Listen for changes
     mediaQuery.addEventListener("change", handleChange);
-  
+
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
@@ -77,7 +81,7 @@ const Navbar = () => {
 
   return (
     <>
-      <Box marginBottom="1rem" fontFamily="Sirin Stencil">
+      <Box marginBottom="1rem" fontFamily="Cinzel, serif">
         <Box
           display="flex"
           padding="10px"
@@ -96,7 +100,7 @@ const Navbar = () => {
               src={logo.src}
               alt="scents logo"
             />
-            <Heading
+            {!small && (<Heading
               marginTop="0.5rem"
               onClick={() => router.push("/home")}
               fontFamily="Great Vibes"
@@ -104,25 +108,21 @@ const Navbar = () => {
               fontSize="2rem"
             >
               Scentdazzle
-            </Heading>
+            </Heading>)}
           </Box>
 
           <Box
-            marginLeft="103px"
             flex="1"
             display="flex"
             justifyContent="center"
+            id="search-bar"
           >
             <SearchBar />
           </Box>
 
           {!small && (
             <>
-              <Box
-                display={{ base: "none", md: "flex" }}
-                gap={10}
-                fontSize="30px"
-              >
+              <Box id="nav-buttons" display={small ? "none" : "flex"} gap={10} fontSize="30px">
                 {navUrls.map((link) => (
                   <button
                     key={link.label}
@@ -156,11 +156,11 @@ const Navbar = () => {
                 </DrawerTrigger>
                 <DrawerContent
                   textAlign="center"
-                  fontFamily="Sirin Stencil"
+                  fontFamily="Cinzel, serif"
                   fontSize="2rem"
                 >
                   <DrawerHeader>
-                    <DrawerTitle>Navigation Page</DrawerTitle>
+                    <DrawerTitle>ScentDazzle</DrawerTitle>
                   </DrawerHeader>
                   <DrawerBody>
                     <VStack mt="10px" display={{ base: "flex" }} spaceY="10px">
@@ -187,13 +187,13 @@ const Navbar = () => {
                       <Button
                         key={user?.name}
                         onClick={() => {
-                          if (user?.name) navigate(`/users/${user?.name}`);
+                          if (user?.name !== "") navigate(`/users/${user?.name}`);
                           else navigate("/login");
                         }}
                         w="full"
                         _hover={{ bg: "pink", color: "black" }}
                       >
-                        {user?.name ? <UserIcon /> : "Login"}
+                        {user?.name !== "" ? <UserIcon /> : "Login"}
                       </Button>
                     </VStack>
                   </DrawerBody>

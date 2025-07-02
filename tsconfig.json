@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "preserve",
     "target": "ES2017",
     "lib": [
       "dom",
@@ -18,7 +19,6 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
     "incremental": true,
     "plugins": [
       {
@@ -31,7 +31,8 @@
       ],
       "src/*": [
         "src/*"
-      ]
+      ],
+      "react": [ "./node_modules/@types/react" ]
     },
     "strictNullChecks": true
   },

@@ -14,7 +14,7 @@ export default {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        roboto: ['Sirin Stencil', 'sans-serif'], // For Google Fonts
+        roboto: ['Cinzel, serif', 'sans-serif'], // For Google Fonts
       },
     },
   },

@@ -1,21 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import perfumeService from "../services/perfumeService.ts";
 import { perfumeData, perfumeUpdateDataFormat } from "../types.ts";
-const defaultperfume = {
-  name: "",
-  price: 500,
-  quantity: "SMALL",
-  imageUrl: "",
-  discription: "",
-};
-
+import { defaultperfume, perfumeFormat } from "../types.ts";
 const initialState = {
   perfumes: [] as perfumeData[],
   isError: false,
   isSuccess: false,
   perfumeLoading: false,
   message: "",
-  currPerfume: { ...defaultperfume },
+  currPerfume: {} as perfumeFormat,
 };
 
 // Create new perfume
@@ -43,12 +36,7 @@ export const getperfume = createAsyncThunk(
       // const token = thunkAPI.getState().auth.user.token
       return await perfumeService.getperfume(name);
     } catch (error) {
-      const message =
-        (error.response &&
-          error.response.data &&
-          error.response.data.message) ||
-        error.message ||
-        error.toString();
+      const message = error.toString()
       return thunkAPI.rejectWithValue(message);
     }
   }
@@ -103,6 +91,10 @@ export const perfumeSlice = createSlice({
     setAvailablePerfumes: (state, action: PayloadAction<perfumeData[]>) => {
       state.perfumes = action.payload;
     },
+
+    setPerfumeLoading: (state)=>{
+      state.perfumeLoading = true
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -161,6 +153,6 @@ export const perfumeSlice = createSlice({
   },
 });
 
-export const { reset, setCurrentPerfume, setAvailablePerfumes } =
+export const { reset, setCurrentPerfume, setAvailablePerfumes, setPerfumeLoading } =
   perfumeSlice.actions;
 export default perfumeSlice.reducer;
