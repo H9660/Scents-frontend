@@ -39,6 +39,7 @@ const Navbar = () => {
   const navUrls = [
     { label: "Home", url: "/home" },
     { label: "Shop", url: "/home" },
+    { label: "Quiz", url: "/quiz" },
   ];
 
   const router = useRouter();
